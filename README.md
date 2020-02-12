@@ -1,6 +1,16 @@
 # P1.9_Collaborative_Project
 
-This repo contains the collaborative project of the MHPC course P1.9. This project is based on the Lennard-Jones Molecular Dynamics code provided during the class as a toy code, and looks forward optimising the code for faster execution.
+## Description
+
+This package contains simplified MD code with multi-threading.
+parallelization for simulating atoms with a Lennard-Jones potential.
+
+The bundled makefiles are set up to compile the executable once
+with OpenMP disabled and once with OpenMP enabled with each build
+placing the various object files in separate directories.
+
+The examples directory contains 3 sets of example input decks
+and the reference directory the corresponding outputs.
 
 ## Collaborators
 
@@ -17,3 +27,9 @@ This repo contains the collaborative project of the MHPC course P1.9. This proje
 4. Before leaving your PC, push to remote
 5. Do not touch others branch
 6. Branch naming convention: `feature/<username>-<feature_name>`
+
+## Compilation instructions
+
+Type: make
+to compile everything and: make clean
+to remove all compiled objects
