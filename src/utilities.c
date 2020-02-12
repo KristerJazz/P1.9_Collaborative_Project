@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include "../include/ljmod.h"
 
 /* helper function: read a line and then return
    the first string with whitespace stripped off */
