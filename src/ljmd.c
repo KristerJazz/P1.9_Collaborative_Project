@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "include/ljmd.c"
+#include "../include/ljmd.h"
 
 /* main */
 int main(int argc, char **argv) {
