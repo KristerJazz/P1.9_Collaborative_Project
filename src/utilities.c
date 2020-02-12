@@ -1,6 +1,10 @@
-/* helper function: read a line and then return
-   the first string with whitespace stripped off */
-static int get_a_line(FILE *fp, char *buf) {
+A #include<stdio.h>
+#include <ctype.h>
+#include <string.h>
+
+    /* helper function: read a line and then return
+       the first string with whitespace stripped off */
+    static int get_a_line(FILE *fp, char *buf) {
   char tmp[BLEN], *ptr;
 
   /* read a line and cut of comments and blanks */
