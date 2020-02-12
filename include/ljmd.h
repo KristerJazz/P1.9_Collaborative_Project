@@ -1,6 +1,7 @@
+#include <stdio.h>
+
 #ifndef __LJMD__
 #define __LJMD__
-
 
 /* 
  * simple lennard-jones potential MD code with velocity verlet.
@@ -8,7 +9,7 @@
  *
  * baseline c version.
  *
- * latest revision: Stefano Campanella, 02/12/2020
+ * author: Stefano Campanella
  */
 
 
