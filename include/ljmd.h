@@ -1,6 +1,22 @@
 #ifndef __LJMD__
 #define __LJMD__
 
+
+/* 
+ * simple lennard-jones potential MD code with velocity verlet.
+ * units: Length=Angstrom, Mass=amu; Energy=kcal
+ *
+ * baseline c version.
+ *
+ * latest revision: Stefano Campanella, 02/12/2020
+ */
+
+
+/**
+ * @brief generic file- or pathname buffer length 
+ */
+#define BLEN 200
+
 /**
  * @brief structure to hold the complete information
  * about the MD system
