@@ -1,8 +1,3 @@
-#include <stdio.h>
-
-#ifndef __LJMD__
-#define __LJMD__
-
 /* 
  * simple lennard-jones potential MD code with velocity verlet.
  * units: Length=Angstrom, Mass=amu; Energy=kcal
@@ -12,6 +7,10 @@
  * author: Stefano Campanella
  */
 
+#ifndef __LJMD__
+#define __LJMD__
+
+#include <stdio.h>
 
 /**
  * @brief generic file- or pathname buffer length 
