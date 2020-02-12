@@ -25,7 +25,5 @@ void velverlet(mdsys_t *sys) {
   /* second part: propagate velocities by another half step */
   for (i = 0; i < sys->natoms; ++i) {
     propagate_velocity(sys, i);
-    propagate_velocity(sys, i);
-    propagate_velocity(sys, i);
   }
 }
