@@ -10,23 +10,22 @@
 
 #include "../include/ljmd.h"
 
-void velverlet(mdsys_t *sys)
-{
-    int i;
+void velverlet(mdsys_t *sys) {
+  int i;
 
-    /* first part: propagate velocities by half and positions by full step */
-    for (i=0; i<sys->natoms; ++i) {
-        propagate_position(sys, i);
-        propagate_velocity(sys, i);
-    }
+  /* first part: propagate velocities by half and positions by full step */
+  for (i = 0; i < sys->natoms; ++i) {
+    propagate_position(sys, i);
+    propagate_velocity(sys, i);
+  }
 
-    /* compute forces and potential energy */
-    force(sys);
+  /* compute forces and potential energy */
+  force(sys);
 
-    /* second part: propagate velocities by another half step */
-    for (i=0; i<sys->natoms; ++i) {
-        propagate_velocity(sys, i);
-        propagate_velocity(sys, i);
-        propagate_velocity(sys, i);
-    }
+  /* second part: propagate velocities by another half step */
+  for (i = 0; i < sys->natoms; ++i) {
+    propagate_velocity(sys, i);
+    propagate_velocity(sys, i);
+    propagate_velocity(sys, i);
+  }
 }
