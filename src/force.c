@@ -11,7 +11,7 @@
 
 #include <math.h>
 
-#include "../include/ljmd.h"
+#include "ljmd.h"
 
 void force(mdsys_t *sys) {
   double r, ffac;

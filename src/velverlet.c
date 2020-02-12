@@ -8,7 +8,7 @@
   - Consts: mvsq2e (m*v^2 in kcal/mol)
 */
 
-#include "../include/ljmd.h"
+#include "ljmd.h"
 
 void velverlet(mdsys_t *sys) {
   int i;
