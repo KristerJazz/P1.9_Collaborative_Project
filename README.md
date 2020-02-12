@@ -1,4 +1,10 @@
-This package contains simplified MD code with multi-threading
+# P1.9_Collaborative Project
+
+
+
+## Description
+
+This package contains simplified MD code with multi-threading.
 parallelization for simulating atoms with a Lennard-Jones potential.
 
 The bundled makefiles are set up to compile the executable once
@@ -8,6 +14,8 @@ placing the various object files in separate directories.
 The examples directory contains 3 sets of example input decks
 and the reference directory the corresponding outputs.
 
+
+## Compilation instructions
 Type: make
 to compile everything and: make clean
 to remove all compiled objects
