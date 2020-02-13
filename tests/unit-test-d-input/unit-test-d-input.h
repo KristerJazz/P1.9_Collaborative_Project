@@ -13,3 +13,5 @@ const double BOX = 17.1580;           // box length (in angstrom)
 const double NSTEPS = 10000;          //nr MD steps
 const double DT = 5.0;                 //MD time step (in fs)
 const double NPRINT= 100;              //output print frequency
+
+#endif
