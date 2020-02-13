@@ -1,15 +1,12 @@
-#include "unit-test-b-velverlet.h"
-
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../include/ljmd.h"
-
+#include "../../include/ljmd.h"
+#include "unit-test-b-velverlet.h"
 
 int main(int argc, char **argv) {
   int i;
-  FILE *fp;
   mdsys_t sys;
   sys.natoms = NATOMS;
   sys.mass = MASS;
@@ -31,16 +28,10 @@ int main(int argc, char **argv) {
   sys.fy = (double *)malloc(sys.natoms * sizeof(double));
   sys.fz = (double *)malloc(sys.natoms * sizeof(double));
   /* define input*/
-  sys.rx[0] = PX;
-  sys.rx[1] = PXX;
-  sys.rx[2] = PXXX;
-  sys.ry[0] = PY;
-  sys.ry[1] = PYY;
-  sys.ry[2] = PYYY;
-  sys.rz[0] = PZ;
-  sys.rz[1] = PZZ;
-  sys.rz[2] = PZZZ;
-  for (i = 0; i < NATOMS; ++i) {
+  for(i=0;i< NATOMS;++i) {
+    sys.rx[i] = P0x[i];
+    sys.ry[i] = P0y[i];
+    sys.rz[i] = P0z[i];
     sys.vx[i] = VX;
     sys.vy[i] = VY;
     sys.vz[i] = VZ;
@@ -55,84 +46,37 @@ int main(int argc, char **argv) {
     propagate_position(&sys, i);
     propagate_velocity(&sys, i);
   }
+
+  
   /* verification */
-  if (fabs(sys.rx[0] - P0ex) > ep) {
-    printf("Test #1 not passed\n");
-    exit(1);
-  }
-  if (fabs(sys.ry[0] - P0ey) > ep) {
-    printf("Test #2 not passed\n");
-    exit(1);
-  }
-  if (fabs(sys.rz[0] - P0ez) > ep) {
-    printf("Test #3 not passed\n");
-    exit(1);
-  }
+  for(i=0;i<NATMOS;++i) {
+  if(fabs(sys.rx[i]-Px[i]) > ep) {
+	printf("Px TEST KO, aborting...\n");
+	exit(1);
+	}	
+   if(fabs(sys.ry[i]-Py[i]) > ep) {
+        printf("Py TEST KO, aborting...\n");
+        exit(1);
+        }
+   if(fabs(sys.rz[i]-Pz[i]) > ep) {
+        printf("Pz TEST KO, aborting...\n");
+        exit(1);
+        }
+   if(fabs(sys.vx[i] -Vx[i]) > ep) {
+	printf("Vx TEST KO, aborting...\n");
+	exit(1);
+        }
+   if(fabs(sys.vy[i] -Vy[i]) > ep) {
+        printf("Vy TEST KO, aborting...\n");
+        exit(1);
+        }
+   if(fabs(sys.vz[i] -Vz[i]) > ep) {
+        printf("Vz TEST KO, aborting...\n");
+        exit(1);
+        }
+   }
 
-  if (fabs(sys.rx[1] - P1ex) > ep) {
-    printf("Test #4 not passed\n");
-    exit(1);
-  }
-  if (fabs(sys.ry[1] - P1ey) > ep) {
-    printf("Test #5 not passed\n");
-    exit(1);
-  }
-  if (fabs(sys.rz[1] - P1ez) > ep) {
-    printf("Test #6 not passed\n");
-    exit(1);
-  }
 
-  if (fabs(sys.rx[2] - P2ex) > ep) {
-    printf("Test #7 not passed\n");
-    exit(1);
-  }
-  if (fabs(sys.ry[2] - P2ey) > ep) {
-    printf("Test #8 not passed\n");
-    exit(1);
-  }
-  if (fabs(sys.rz[2] - P2ez) > ep) {
-    printf("Test #9 not passed\n");
-    exit(1);
-  }
-
-  if (fabs(sys.vx[0] - V0ex) > ep) {
-    printf("Test #10 not passed\n");
-    exit(1);
-  }
-  if (fabs(sys.vy[0] - V0ey) > ep) {
-    printf("Test #11 not passed\n");
-    exit(1);
-  }
-  if (fabs(sys.vz[0] - V0ez) > ep) {
-    printf("Test #12 not passed\n");
-    exit(1);
-  }
-
-  if (fabs(sys.vx[1] - V1ex) > ep) {
-    printf("Test #13 not passed\n");
-    exit(1);
-  }
-  if (fabs(sys.vy[1] - V1ey) > ep) {
-    printf("Test #14 not passed\n");
-    exit(1);
-  }
-  if (fabs(sys.vz[1] - V1ez) > ep) {
-    printf("Test #15 not passed\n");
-    exit(1);
-  }
-
-  if (fabs(sys.vx[2] - V2ex) > ep) {
-    printf("Test #16 not passed\n");
-    exit(1);
-  }
-  if (fabs(sys.vy[2] - V2ey) > ep) {
-    printf("Test #17 not passed\n");
-    exit(1);
-  }
-  if (fabs(sys.vz[2] - V2ez) > ep) {
-    printf("Test #18 not passed\n");
-    exit(1);
-  }
   printf("TEST PASSED\n");
   free(sys.rx);
   free(sys.ry);
