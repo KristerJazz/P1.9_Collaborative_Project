@@ -34,12 +34,12 @@ typedef struct _mdsys mdsys_t;
 /**
  * @brief boltzman constant in kcal/mol/K
  */
-const double kboltz = 0.0019872067;
+extern const double kboltz;
 
 /**
  * @brief conversion constant: m*v^2 in kcal/mol
  */
-const double mvsq2e = 2390.05736153349;
+extern const double mvsq2e;
 
 /**
  * @brief helper function: read a line and then return
