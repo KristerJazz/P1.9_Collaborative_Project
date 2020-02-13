@@ -18,7 +18,7 @@
 
 inline bool cmp(double x, double y) { return fabs(x - y) < TOL; }
 
-int test_in_x(mdsys_t* sys) {
+int test_in_x(mdsys_t* sys, bool *status) {
   sys->rx[1] = sys->sigma;
   sys->ry[1] = 0.0;
   sys->rz[1] = 0.0;
@@ -31,11 +31,13 @@ int test_in_x(mdsys_t* sys) {
 
   if (cmp(sys->fx[0], FREF) && cmp(sys->fy[0], 0.0) && cmp(sys->fz[0], 0.0))
     return TEST_SUCCESS;
-  else
+  else {
+    *status = false;
     return TEST_FAILED;
+  }
 }
 
-int test_in_y(mdsys_t* sys) {
+int test_in_y(mdsys_t* sys, bool * status) {
   sys->rx[1] = 0.0;
   sys->ry[1] = sys->sigma;
   sys->rz[1] = 0.0;
@@ -48,11 +50,13 @@ int test_in_y(mdsys_t* sys) {
 
   if (cmp(sys->fx[0], 0.0) && cmp(sys->fy[0], FREF) && cmp(sys->fz[0], 0.0))
     return TEST_SUCCESS;
-  else
+  else {
+    *status = false;
     return TEST_FAILED;
+  }
 }
 
-int test_in_z(mdsys_t* sys) {
+int test_in_z(mdsys_t* sys, bool * status) {
   sys->rx[1] = 0.0;
   sys->ry[1] = 0.0;
   sys->rz[1] = sys->sigma;
@@ -65,11 +69,13 @@ int test_in_z(mdsys_t* sys) {
 
   if (cmp(sys->fx[0], 0.0) && cmp(sys->fy[0], 0.0) && cmp(sys->fz[0], FREF))
     return TEST_SUCCESS;
-  else
+  else {
+    *status = false;
     return TEST_FAILED;
+  }
 }
 
-int test_out_x(mdsys_t* sys) {
+int test_out_x(mdsys_t* sys, bool * status) {
   sys->rx[1] = sys->box / 2;
   sys->ry[1] = 0.0;
   sys->rz[1] = 0.0;
@@ -82,11 +88,13 @@ int test_out_x(mdsys_t* sys) {
 
   if (cmp(sys->fx[0], 0.0) && cmp(sys->fy[0], 0.0) && cmp(sys->fz[0], 0.0))
     return TEST_SUCCESS;
-  else
+  else {
+    *status = false;
     return TEST_FAILED;
+  }
 }
 
-int test_out_y(mdsys_t* sys) {
+int test_out_y(mdsys_t* sys, bool * status) {
   sys->rx[1] = 0.0;
   sys->ry[1] = sys->box / 2;
   sys->rz[1] = 0.0;
@@ -99,11 +107,13 @@ int test_out_y(mdsys_t* sys) {
 
   if (cmp(sys->fx[0], 0.0) && cmp(sys->fy[0], 0.0) && cmp(sys->fz[0], 0.0))
     return TEST_SUCCESS;
-  else
+  else {
+    *status = false;
     return TEST_FAILED;
+  }
 }
 
-int test_out_z(mdsys_t* sys) {
+int test_out_z(mdsys_t* sys, bool * status) {
   sys->rx[1] = 0.0;
   sys->ry[1] = 0.0;
   sys->rz[1] = sys->box / 2;
@@ -116,12 +126,15 @@ int test_out_z(mdsys_t* sys) {
 
   if (cmp(sys->fx[0], 0.0) && cmp(sys->fy[0], 0.0) && cmp(sys->fz[0], 0.0))
     return TEST_SUCCESS;
-  else
+  else {
+    *status = false;
     return TEST_FAILED;
+  }
 }
 
 int main() {
   mdsys_t sys;
+  bool status = true;
 
   sys.natoms = NATOMS;
   sys.mass = MASS;
@@ -143,17 +156,17 @@ int main() {
 
   puts("==== BEGIN TESTS ====");
   printf("particles inside cutoff region, along x: %s\n",
-         !test_in_x(&sys) ? "PASSED" : "FAILED");
+         !test_in_x(&sys,&status) ? "PASSED" : "FAILED");
   printf("particles inside cutoff region, along y: %s\n",
-         !test_in_y(&sys) ? "PASSED" : "FAILED");
+         !test_in_y(&sys,&status) ? "PASSED" : "FAILED");
   printf("particles inside cutoff region, along z: %s\n",
-         !test_in_z(&sys) ? "PASSED" : "FAILED");
+         !test_in_z(&sys,&status) ? "PASSED" : "FAILED");
   printf("particles outside cutoff region, along x: %s\n",
-         !test_out_x(&sys) ? "PASSED" : "FAILED");
+         !test_out_x(&sys,&status) ? "PASSED" : "FAILED");
   printf("particles outside cutoff region, along y: %s\n",
-         !test_out_y(&sys) ? "PASSED" : "FAILED");
+         !test_out_y(&sys,&status) ? "PASSED" : "FAILED");
   printf("particles outside cutoff region, along z: %s\n",
-         !test_out_z(&sys) ? "PASSED" : "FAILED");
+         !test_out_z(&sys,&status) ? "PASSED" : "FAILED");
   puts("==== END TESTS ====");
  
   free(sys.rx);
@@ -163,4 +176,6 @@ int main() {
   free(sys.fy);
   free(sys.fz);
 
+  if(status) return EXIT_SUCCESS;
+  else       return EXIT_FAILURE;
 }
