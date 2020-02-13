@@ -23,7 +23,6 @@ int test_equality(double in, double test_value) {
 
 int main(int argc, char **argv) {
   char restfile[BLEN], trajfile[BLEN], ergfile[BLEN], line[BLEN];
-  // int testing_progress=0;
 
   /* read input file */
   puts("============BEGIN TESTS=============");
