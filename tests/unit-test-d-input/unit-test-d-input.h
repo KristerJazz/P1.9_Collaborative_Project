@@ -1,3 +1,5 @@
+#ifndef __UNIT_TEST_D_INPUT_H__
+#define __UNIT_TEST_D_INPUT_H__
 /* Sample input values */
 
 const int NATOMS = 108;               //natoms
