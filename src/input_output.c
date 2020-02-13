@@ -2,7 +2,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "../include/ljmd.h"
+#include "ljmd.h"
 
 int get_a_line(FILE *fp, char *buf) {
   char tmp[BLEN], *ptr;
