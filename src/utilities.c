@@ -1,4 +1,4 @@
-#include "../include/ljmd.h"
+#include "ljmd.h"
 
 /* helper function: zero out an array */
 void azzero(double *d, const int n) {
