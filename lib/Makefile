@@ -10,19 +10,28 @@ SRC=$(wildcard ../src/*.c)
 HEADERS=$(wildcard ../include/*.h)
 VPATH=../src
 OBJ=$(SRC:../src/%.c=%.o)
-EXE_PATH=..
-EXE=ljmd.x
 
-default: $(EXE_PATH)/$(EXE)
+PROJECT_NAME=ljmd
+
+EXE_PATH=..
+EXE=$(PROJECT_NAME).x
+
+SHARED_PATH=.
+SHARED_FILE=lib$(PROJECT_NAME).so
+
+default: $(EXE_PATH)/$(EXE) $(SHARED_PATH)/$(SHARED_FILE)
 
 clean:
-	rm -f *.mod *.o $(EXE_PATH)/$(EXE)
+	rm -f *.mod *.o *.so ../*.x
 
 # linker rule
-$(EXE_PATH)/$(EXE): $(OBJ) $(HEADERS)
-	$(CC) -o $@ $(CFLAGS) $^ $(LDLIBS)
+$(EXE_PATH)/$(EXE): $(SHARED_PATH)/$(SHARED_FILE)
+	$(CC) -o $@ $(CFLAGS) $(LDLIBS) -l$(PROJECT_NAME) -L$(SHARED_PATH)
+
+$(SHARED_PATH)/$(SHARED_FILE): $(OBJ) $(HEADERS)
+	$(CC) -shared -o $@ $(CFLAGS) $^ $(LDLIBS)
 
 # compilation pattern rule for objects
 %.o: %.c $(HEADERS)
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) $< -fPIC
 
