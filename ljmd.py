@@ -1,5 +1,5 @@
 from ctypes import *
 
-so_file = "Obj-serial/ljmd.o"
+#so_files = "Obj-serial/ljmd.o"
 
-my_functions = CDLL(so_file)
+#my_functions = CDLL(so_file)
