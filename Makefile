@@ -10,5 +10,5 @@ clean:
 	$(MAKE) $(MFLAGS) -C lib clean
 	$(MAKE) $(MFLAGS) -C examples clean
 
-check: serial
+check: all
 	$(MAKE) $(MFLAGS) -C examples check
