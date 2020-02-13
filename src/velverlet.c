@@ -15,8 +15,8 @@ void velverlet(mdsys_t *sys) {
 
   /* first part: propagate velocities by half and positions by full step */
   for (i = 0; i < sys->natoms; ++i) {
-    propagate_position(sys, i);
     propagate_velocity(sys, i);
+    propagate_position(sys, i);
   }
 
   /* compute forces and potential energy */
