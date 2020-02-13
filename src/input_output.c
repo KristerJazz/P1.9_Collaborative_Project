@@ -1,3 +1,12 @@
+/*
+Input-Output function
+Contributor: Krister Jazz Urog
+
+Dependencies:
+	struct: mdsys_t
+	
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
