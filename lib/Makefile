@@ -10,14 +10,16 @@ SRC=$(wildcard ../src/*.c)
 HEADERS=$(wildcard ../include/*.h)
 VPATH=../src
 OBJ=$(SRC:../src/%.c=%.o)
+EXE_PATH=..
+EXE=ljmd.x
 
-default: ../ljmd-serial.x
+default: $(EXE_PATH)/$(EXE)
 
 clean:
-	rm -f *.mod *.o ../ljmd-serial.x
+	rm -f *.mod *.o $(EXE_PATH)/$(EXE)
 
 # linker rule
-../ljmd-serial.x: $(OBJ) $(HEADERS)
+$(EXE_PATH)/$(EXE): $(OBJ) $(HEADERS)
 	$(CC) -o $@ $(CFLAGS) $^ $(LDLIBS)
 
 # compilation pattern rule for objects
