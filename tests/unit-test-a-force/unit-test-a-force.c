@@ -155,4 +155,12 @@ int main() {
   printf("particles outside cutoff region, along z: %s\n",
          !test_out_z(&sys) ? "PASSED" : "FAILED");
   puts("==== END TESTS ====");
+ 
+  free(sys.rx);
+  free(sys.ry);
+  free(sys.rz);
+  free(sys.fx);
+  free(sys.fy);
+  free(sys.fz);
+
 }
