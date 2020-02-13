@@ -12,7 +12,7 @@ LDLIBS=-lm
 DEPENDENCIES=$(SRC_PATH)/input_output.c
 
 SRC=$(wildcard *.[ch])
-EXE=unit_test_d.x
+EXE=unit-test-d-input.x
 
 default: $(EXE)
 
