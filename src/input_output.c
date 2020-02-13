@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include <ctypes.h>
+#include <ctype.h>
 
 #include "../include/ljmd.h"
 
