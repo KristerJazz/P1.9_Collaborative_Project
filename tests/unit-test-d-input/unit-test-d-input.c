@@ -1,5 +1,5 @@
-#ifndef __UNIT_TEST_C_EKIN_H__
-#define __UNIT_TEST_C_EKIN_H__
+#ifndef __UNIT_TEST_D_INPUT_H__
+#define __UNIT_TEST_D_INPUT_H__
 /*
 
 Unit test - Input function
