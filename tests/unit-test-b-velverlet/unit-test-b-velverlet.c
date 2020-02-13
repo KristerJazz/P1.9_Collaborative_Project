@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #include "../include/ljmd.h"
-#include "velverlet_step.c"
+
 
 int main(int argc, char **argv) {
   int i;

@@ -9,7 +9,7 @@ HEADERS=$(wildcard ../../include/*.h)
 CFLAGS=-Wall -g -O3 -ffast-math -fomit-frame-pointer -I$(HEADERS_PATH)
 LDLIBS=-lm
 
-DEPENDENCIES=$(SRC_PATH)/velverlet.c $(SRC_PATH)/constants.c
+DEPENDENCIES=$(SRC_PATH)/velverlet_step.c $(SRC_PATH)/constants.c
 
 SRC=$(wildcard *.[ch])
 EXE=unit-test-b-velverlet.x

@@ -1,5 +1,4 @@
 /* physical constant and inputs*/
-const double mvsq2e = 2390.05736153349;
 const double NATOMS = 3;
 const double MASS = 39.948;
 const double EPSILON = 0.2379;
