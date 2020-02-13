@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
   sys.fy = (double *)malloc(sys.natoms * sizeof(double));
   sys.fz = (double *)malloc(sys.natoms * sizeof(double));
   /* define input*/
-  for(i=0;i< NATOMS;++i) {
+  for (i = 0; i < NATOMS; ++i) {
     sys.rx[i] = P0x[i];
     sys.ry[i] = P0y[i];
     sys.rz[i] = P0z[i];
@@ -47,35 +47,33 @@ int main(int argc, char **argv) {
     propagate_velocity(&sys, i);
   }
 
-  
   /* verification */
-  for(i=0;i<NATOMS;++i) {
-  if(fabs(sys.rx[i]-Px[i]) > ep) {
-	printf("Px TEST KO, aborting...\n");
-	exit(1);
-	}	
-   if(fabs(sys.ry[i]-Py[i]) > ep) {
-        printf("Py TEST KO, aborting...\n");
-        exit(1);
-        }
-   if(fabs(sys.rz[i]-Pz[i]) > ep) {
-        printf("Pz TEST KO, aborting...\n");
-        exit(1);
-        }
-   if(fabs(sys.vx[i] -Vx[i]) > ep) {
-	printf("Vx TEST KO, aborting...\n");
-	exit(1);
-        }
-   if(fabs(sys.vy[i] -Vy[i]) > ep) {
-        printf("Vy TEST KO, aborting...\n");
-        exit(1);
-        }
-   if(fabs(sys.vz[i] -Vz[i]) > ep) {
-        printf("Vz TEST KO, aborting...\n");
-        exit(1);
-        }
-   }
-
+  for (i = 0; i < NATOMS; ++i) {
+    if (fabs(sys.rx[i] - Px[i]) > ep) {
+      printf("Px TEST KO, aborting...\n");
+      exit(1);
+    }
+    if (fabs(sys.ry[i] - Py[i]) > ep) {
+      printf("Py TEST KO, aborting...\n");
+      exit(1);
+    }
+    if (fabs(sys.rz[i] - Pz[i]) > ep) {
+      printf("Pz TEST KO, aborting...\n");
+      exit(1);
+    }
+    if (fabs(sys.vx[i] - Vx[i]) > ep) {
+      printf("Vx TEST KO, aborting...\n");
+      exit(1);
+    }
+    if (fabs(sys.vy[i] - Vy[i]) > ep) {
+      printf("Vy TEST KO, aborting...\n");
+      exit(1);
+    }
+    if (fabs(sys.vz[i] - Vz[i]) > ep) {
+      printf("Vz TEST KO, aborting...\n");
+      exit(1);
+    }
+  }
 
   printf("TEST PASSED\n");
   free(sys.rx);
