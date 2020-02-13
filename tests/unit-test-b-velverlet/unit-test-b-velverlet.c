@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 
   
   /* verification */
-  for(i=0;i<NATMOS;++i) {
+  for(i=0;i<NATOMS;++i) {
   if(fabs(sys.rx[i]-Px[i]) > ep) {
 	printf("Px TEST KO, aborting...\n");
 	exit(1);
