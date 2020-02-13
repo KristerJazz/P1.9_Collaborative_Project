@@ -1,14 +1,15 @@
+#ifndef __UNIT_TEST_C_EKIN_H__
+#define __UNIT_TEST_C_EKIN_H__
 /*
 
 Unit test - Input function
 Contributor - Krister Jazz Urog
 
 */
-#include "unit-test-d-input.h"
 
 #include <stdlib.h>
-
 #include "../include/ljmd.h"
+#include "unit-test-d-input.h"
 
 #define TEST_SUCCESS 0
 #define TEST_FAILED -1
