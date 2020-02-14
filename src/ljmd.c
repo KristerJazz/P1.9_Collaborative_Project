@@ -5,6 +5,7 @@
  * baseline c version.
  */
 
+#include <assert.h>
 #include <ctype.h>
 #include <math.h>
 #include <stdio.h>
@@ -55,13 +56,16 @@ int main(int argc, char **argv) {
   sys.fz = (double *)malloc(sys.natoms * sizeof(double));
 
   /* read restart */
+  int input_scan;
   fp = fopen(restfile, "r");
   if (fp) {
     for (i = 0; i < sys.natoms; ++i) {
-      fscanf(fp, "%lf%lf%lf", sys.rx + i, sys.ry + i, sys.rz + i);
+      input_scan = fscanf(fp, "%lf%lf%lf", sys.rx + i, sys.ry + i, sys.rz + i);
+      assert(input_scan != 0);
     }
     for (i = 0; i < sys.natoms; ++i) {
-      fscanf(fp, "%lf%lf%lf", sys.vx + i, sys.vy + i, sys.vz + i);
+      input_scan = fscanf(fp, "%lf%lf%lf", sys.vx + i, sys.vy + i, sys.vz + i);
+      assert(input_scan != 0);
     }
     fclose(fp);
     azzero(sys.fx, sys.natoms);
