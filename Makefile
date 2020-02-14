@@ -1,18 +1,14 @@
 # -*- Makefile -*-
 SHELL=/bin/sh
-############################################
-# derived makefile variables
-OBJ_SERIAL=$(SRC:src/%.f90=Obj-serial/%.o)
-############################################
 
-default: serial
+default: all
 
-serial:
-	$(MAKE) $(MFLAGS) -C Obj-$@
+all:
+	$(MAKE) $(MFLAGS) -C lib
 
 clean:
-	$(MAKE) $(MFLAGS) -C Obj-serial clean
+	$(MAKE) $(MFLAGS) -C lib clean
 	$(MAKE) $(MFLAGS) -C examples clean
 
-check: serial
+check: all
 	$(MAKE) $(MFLAGS) -C examples check
