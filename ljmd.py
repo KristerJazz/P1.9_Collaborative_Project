@@ -1,5 +1,6 @@
 from ctypes import *
 
-#so_files = "Obj-serial/ljmd.o"
+so_files = "lib/libljmd.so"
 
-#my_functions = CDLL(so_file)
+my_functions = CDLL(so_files)
+print(my_functions)
