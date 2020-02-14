@@ -2,7 +2,8 @@
 SHELL=/bin/sh
 
 # FIXME: Test D has been disable since it is not fully automated
-SUBDIR = unit-test-a-force unit-test-b-velverlet unit-test-c-ekin
+SUBDIR = unit-test-a-force unit-test-b-velverlet unit-test-c-ekin \
+				 unit-test-d-input
 
 .SECONDEXPANSION:
 CLEAN_SUBDIRS = $$(foreach subdir,$$(SUBDIR),$$(subdir)-clean)
