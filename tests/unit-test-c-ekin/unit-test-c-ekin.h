@@ -1,6 +1,7 @@
 #ifndef __UNIT_TEST_C_EKIN_H__
 #define __UNIT_TEST_C_EKIN_H__
 
+#include <stdbool.h>
 #include <string.h>
 
 /* Unit test case */
@@ -11,6 +12,7 @@ typedef struct unit_case {
   double exp_ekin;
   double exp_temp;
   char case_name[16];
+  bool ignore;
 } unit_case_t;
 
 /* Test cases */
@@ -23,7 +25,8 @@ const unit_case_t test_cases[] = {
      .velocities[2] = {0, 2, 3},
      .exp_ekin = 1861821.22383153,
      .exp_temp = 312301218.897113,
-     .case_name = "Weird case"},
+     .case_name = "Weird case",
+     .ignore = true},
     /* Happy case */
     {.natoms = 3,
      .mass = 39.948,
@@ -35,7 +38,8 @@ const unit_case_t test_cases[] = {
                        8.8892011842225927e-04},
      .exp_ekin = 0.415671348661546,
      .exp_temp = 69.7245617280353,
-     .case_name = "Happy case"},
+     .case_name = "Happy case",
+     .ignore = false},
     /* Negative mass case */
     {.natoms = 3,
      .mass = -48.2,
@@ -59,7 +63,8 @@ const unit_case_t test_cases[] = {
                        8.8892011842225927e-04},
      .exp_ekin = 0,
      .exp_temp = 0,
-     .case_name = "Zero mass"},
+     .case_name = "Zero mass",
+     .ignore = false},
     /* Single Atom case */
     {.natoms = 1,
      .mass = 23.23,
@@ -67,7 +72,8 @@ const unit_case_t test_cases[] = {
                        6.6929180130627429e-04},
      .exp_ekin = 0.122405238886546,
      .exp_temp = 0,
-     .case_name = "Single Atom"},
+     .case_name = "Single Atom",
+     .ignore = true},
     /* Double Atom case */
     {.natoms = 2,
      .mass = 26.5,
