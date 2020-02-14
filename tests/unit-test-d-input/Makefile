@@ -14,6 +14,8 @@ DEPENDENCIES=$(SRC_PATH)/input_output.c
 SRC=$(wildcard *.[ch])
 EXE=unit-test-d-input.x
 
+SAMPLE_INPUT=sample.inp
+
 default: $(EXE)
 
 $(EXE): $(SRC) $(HEADERS) $(DEPENDENCIES)
@@ -23,7 +25,7 @@ clean:
 	rm -f *.mod *.o *.x
 
 check: $(EXE)
-	./$(EXE)
+	./$(EXE) < $(SAMPLE_INPUT)
 
 # compilation pattern rule for objects
 %.o: %.c
