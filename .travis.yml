@@ -8,5 +8,6 @@ compiler:
   - gcc
 
 script:
+  - make units-check
   - make check
 
