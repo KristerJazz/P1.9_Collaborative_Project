@@ -4,6 +4,8 @@ include ../Rules.mk
 LD_LIBRARY_PATH=$(LIB_PATH)
 export LD_LIBRARY_PATH
 
+PERF_SAMPLE=argon_108.inp
+
 default: check
 
 clean:
@@ -23,7 +25,7 @@ check: $(EXE)
 perf: $(EXE) $(PERF_RESULT)
 
 $(PERF): $(EXE)
-	perf record -o $(PERF) -T -B $(EXE) < argon_108.inp
+	perf record -o $(PERF) -T -B $(EXE) < $(PERF_SAMPLE)
 
 $(PERF_RESULT): $(PERF)
 	perf report -i $(PERF)
