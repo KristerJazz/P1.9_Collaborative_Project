@@ -7,7 +7,7 @@ export LD_LIBRARY_PATH
 default: check
 
 clean:
-	rm -f *.xyz *.dat
+	rm -f *.xyz *.dat $(PERF_PATH)/*.data $(PERF_RESULT)
 
 check: $(EXE)
 	$(EXE) < argon_108.inp
@@ -20,3 +20,10 @@ check: $(EXE)
 	cmp a.dat b.dat || exit 1
 	rm -f a.dat b.dat
 
+perf: $(EXE) $(PERF_RESULT)
+
+$(PERF): $(EXE)
+	perf record -o $(PERF) -T -B $(EXE) < argon_108.inp
+
+$(PERF_RESULT): $(PERF)
+	perf report -i $(PERF)
