@@ -35,10 +35,10 @@ class MDSYS_T(Structure):
 				('fx', POINTER(c_double)), ('fy', POINTER(c_double)), ('fz', POINTER(c_double))] 
 
 class LJMD:
-	def __init__(self, so_file, input_file):
+	def __init__(self, so_file):
 		self._ljmd = CDLL(so_file)
-		self.time_step = 0
 
+	def initialize_system(self, input_file):
 		data = self.read_input(input_file)
 
 		self.natoms = int(data[0])
@@ -54,10 +54,6 @@ class LJMD:
 		self.dt = float(data[10])
 		self.nprint = int(data[11])
 
-		self.initialize_system()
-
-	def initialize_system(self):
-		
 		self.sys = MDSYS_T(natoms=self.natoms,
 							mass=self.mass,
 							epsilon=self.epsilon,
@@ -94,7 +90,6 @@ class LJMD:
 			if (self.sys.nfi%self.nprint)==0:
 				self.write_output()
 
-			#self._ljmd.velverlet(byref(self.sys))
 			self.propagate1()
 			self.force()
 			self.propagate2()
@@ -163,6 +158,7 @@ if __name__ == '__main__':
 	print(input_path)
 	so_path = "lib/libljmd.so"
 	#input_path = "examples/argon_108.inp"
-	main = LJMD(so_path, input_path)
+	main = LJMD(so_path)
+	main.initialize_system(input_path)
 	main.run_simulation()
 	#main.go()
