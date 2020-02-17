@@ -11,6 +11,14 @@ This file includes the profiling results of the project.
 
 The other functions are below 1%.
 
+## Walltime 
+
+|    Function        | Argon 108   | Argon 2916  |
+|--------------------|-------------|-------------|
+| walltime           | 6,407873303 | 296,5620224 |
+
+> Time measured in seconds
+
 ## Hotspots
 
 ### `force()`
