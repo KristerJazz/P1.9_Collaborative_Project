@@ -43,8 +43,6 @@ void force(mdsys_t *sys) {
   for (i = 0; i < (sys->natoms) - 1; ++i) {
     for (j = i + 1; j < (sys->natoms); ++j) {
 
-      if (i == j) continue;
-
       /* get distance between particle i and j */
       rx = pbc(sys->rx[i] - sys->rx[j], 0.5 * sys->box);
       ry = pbc(sys->ry[i] - sys->ry[j], 0.5 * sys->box);
