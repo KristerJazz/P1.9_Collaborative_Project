@@ -9,7 +9,9 @@
   - math
 */
 
+#include <omp.h>
 #include <math.h>
+#include <stdlib.h>
 
 #include "ljmd.h"
 
@@ -26,9 +28,10 @@ inline double pbc(double x, const double boxby2) {
 }
 
 void force(mdsys_t *sys) {
-  double ffac;
-  double rx, ry, rz;
-  int i, j;
+  double epot;
+  
+  omp_lock_t * writelock;
+  epot = 0;
 
   /* zero energy and forces */
   sys->epot = 0.0;
@@ -40,7 +43,34 @@ void force(mdsys_t *sys) {
   double c6 = 4.0 * sys->epsilon * POW6(sys->sigma);
   double rcsq = POW2(sys->rcut);
 
-  for (i = 0; i < (sys->natoms) - 1; ++i) {
+  writelock = (omp_lock_t *) malloc(sys->natoms * sizeof(omp_lock_t));
+
+  int k = 0;
+
+  /* Initialise the locks */
+#pragma omp parallel
+{
+  
+  #pragma omp for
+  for(k = 0; k < (sys->natoms); ++k) {
+    omp_init_lock(&writelock[k]);
+  }
+}
+
+#pragma omp parallel reduction(+:epot)
+{
+  int i, j;
+  int tid = omp_get_thread_num();
+  int tsize = omp_get_num_threads();
+
+  for (i = tid; i < (sys->natoms) - 1; i += tsize) {
+
+    double rx, ry, rz;
+    double fx, fy, fz;
+    double ffac;
+
+    fx = 0; fy = 0; fz = 0;
+
     for (j = i + 1; j < (sys->natoms); ++j) {
 
       if (i == j) continue;
@@ -53,15 +83,41 @@ void force(mdsys_t *sys) {
 
       /* compute force and energy if within cutoff */
       if (rsq < rcsq) {
+
+        /* No race condition risk*/
         double rinv2 = 1.0 / rsq;
         double rinv6 = POW3(rinv2);
         ffac = (12.0 * c12 * rinv6 - 6.0 * c6) * rinv6 * rinv2;
-        sys->epot += rinv6 * (c12 * rinv6 - c6); 
 
-        sys->fx[i] += rx * ffac; sys->fx[j] -= rx * ffac;
-        sys->fy[i] += ry * ffac; sys->fy[j] -= ry * ffac;
-        sys->fz[i] += rz * ffac; sys->fz[j] -= rz * ffac;
+        epot += rinv6 * (c12 * rinv6 - c6); 
+
+        fx += rx * ffac; 
+        fy += ry * ffac; 
+        fz += rz * ffac; 
+
+        omp_set_lock(&writelock[j]);
+        sys->fx[j] -= rx * ffac;
+        sys->fy[j] -= ry * ffac;
+        sys->fz[j] -= rz * ffac;
+        omp_unset_lock(&writelock[j]);
+
       }
     }
+
+    omp_set_lock(&writelock[i]);
+    sys->fx[i] += fx;
+    sys->fy[i] += fy;
+    sys->fz[i] += fz;
+    omp_unset_lock(&writelock[i]);
+    
   }
+}
+  sys->epot = epot;
+
+  /* Free the locks */
+#pragma omp parallel for
+  for(k = 0; k < (sys->natoms); ++k) {
+    omp_destroy_lock(&writelock[k]);
+  }
+  free(writelock);
 }
