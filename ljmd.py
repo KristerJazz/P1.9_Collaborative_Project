@@ -102,7 +102,7 @@ class LJMD:
 	
 	def read_input(self, datafile):
 		with open(datafile) as f:
-			data = [x.split(' ')[0] for x in f.readlines()] 
+			data = [x.split()[0] for x in f.readlines()] 
 
 		return data
 	
