@@ -81,44 +81,58 @@ class LJMD:
 
 		self.force()
 		self.ekin()
-		self.sys.nfi = 1
+		self.sys.nfi = 0
 
 	def run_simulation(self):
 		print("Running simulation")
 
-		erg = open(self.ergfile, 'w')
-		traj = open(self.trajfile, 'w')
-
+		self.erg = open(self.ergfile, 'w')
+		self.traj = open(self.trajfile, 'w')
+		self.write_output()
+		self.sys.nfi = 1
 		while self.sys.nfi <= self.sys.nsteps:
 			if (self.sys.nfi%self.nprint)==0:
-				erg.write("% 8d % 20.8f % 20.8f % 20.8f % 20.8f\n" % (self.sys.nfi, self.sys.temp,
-         					self.sys.ekin, self.sys.epot, self.sys.ekin + self.sys.epot))
+				self.write_output()
 
-				traj.write("%d\n nfi=%d etot=%20.8f\n" % (self.sys.natoms, self.sys.nfi, 
-							self.sys.ekin + self.sys.epot))
-				for i in range(self.natoms):
-					traj.write("Ar  %20.8f %20.8f %20.8f\n" % (self.sys.rx[i], self.sys.ry[i],
-            					self.sys.rz[i]))
-
-			self._ljmd.velverlet(byref(self.sys))
+			#self._ljmd.velverlet(byref(self.sys))
+			self.propagate1()
+			self.force()
+			self.propagate2()
 			self._ljmd.ekin(byref(self.sys))
 			self.sys.nfi+=1
 			
 		print("Done simulation")
 		
-		erg.close()
-		traj.close()
+		self.erg.close()
+		self.traj.close()
 	
-
+	def propagate1(self):
+		for i in range(self.natoms):
+			self._ljmd.propagate_velocity(byref(self.sys), i)
+			self._ljmd.propagate_position(byref(self.sys), i)
 
 	def force(self):
-		print("The force awakens, (Force initialized)")
 		self._ljmd.force(byref(self.sys))
-	
+
+	def propagate2(self):
+		for i in range(self.natoms):
+			self._ljmd.propagate_velocity(byref(self.sys), i)
+
 	def ekin(self):
 		print("Kinetic energy initialized")
 		self._ljmd.ekin(byref(self.sys))
 	
+	def write_output(self):
+		self.erg.write("% 8d % 20.8f % 20.8f % 20.8f % 20.8f\n" % (self.sys.nfi, self.sys.temp,
+         				self.sys.ekin, self.sys.epot, self.sys.ekin + self.sys.epot))
+
+		self.traj.write("%d\n nfi=%d etot=%20.8f\n" % (self.sys.natoms, self.sys.nfi, 
+						self.sys.ekin + self.sys.epot))
+
+		for i in range(self.natoms):
+			self.traj.write("Ar  %20.8f %20.8f %20.8f\n" % (self.sys.rx[i], self.sys.ry[i],
+         		   			self.sys.rz[i]))
+
 	def read_input(self, datafile):
 		with open(datafile) as f:
 			data = [x.split()[0] for x in f.readlines()] 
@@ -145,6 +159,7 @@ class LJMD:
 
 if __name__ == '__main__':
 	input_path = "examples/"+sys.argv[1]
+	output_path = "examples/"
 	print(input_path)
 	so_path = "lib/libljmd.so"
 	#input_path = "examples/argon_108.inp"
