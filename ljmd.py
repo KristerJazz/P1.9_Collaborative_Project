@@ -7,15 +7,31 @@ Date: 17 February, 2020
 from ctypes import *
 
 class MDSYS_T(Structure):
+	"""
+	Molecular dynamics system structure object wrapper for a similar C struct.
+
+	-----------------------------------------------
+	Parameters:
+		natoms = number of atoms
+		nfi = number of iterations
+		nsteps = number of simulation steps
+		dt = time step
+		mass = mass of atom
+		epsilon =
+		sigma = 
+		box =
+		rcut =
+		ekin = Kinetic energy 
+		epot = Potential energy
+		temp = Temperature
+	"""
 	_fields_ = [('natoms', c_int), ('nfi', c_int), ('nsteps', c_int),
 				('dt', c_double), ('mass', c_double), ('epsilon', c_double),
 				('sigma', c_double), ('box', c_double), ('rcut', c_double),
 				('ekin', c_double), ('epot', c_double), ('temp', c_double), 
 				('rx', POINTER(c_double)), ('ry', POINTER(c_double)), ('rz', POINTER(c_double)), 
 				('vx', POINTER(c_double)), ('vy', POINTER(c_double)), ('vz', POINTER(c_double)), 
-				('fx', POINTER(c_double)), ('fy', POINTER(c_double)), ('fz', POINTER(c_double))]
-	
-
+				('fx', POINTER(c_double)), ('fy', POINTER(c_double)), ('fz', POINTER(c_double))] 
 class LJMD:
 	def __init__(self, so_file, input_file):
 		self._ljmd = CDLL(so_file)
@@ -81,9 +97,8 @@ class LJMD:
 		self._ljmd.force(byref(self.sys))
 	
 	def ekin(self):
-		print("Ekin initialize")
+		print("Kinetic energy initialized")
 		self._ljmd.ekin(byref(self.sys))
-
 	
 	def read_input(self, datafile):
 		with open(datafile) as f:
