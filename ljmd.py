@@ -2,15 +2,10 @@ from ctypes import *
 
 so_files = "lib/libljmd.so"
 
-my_functions = CDLL(so_files)
-
-def read_input(datafile):
-	with open(datafile) as f:
-		data = f.read()
-		print(data)
+ljmd = CDLL(so_files)
 
 
-class mdsys_t(Structure):
+class MDSYS_T(Structure):
 	_fields_ = [('natoms', c_int), ('nfi', c_int), ('nsteps', c_int),
 				('dt', c_double), ('mass', c_double), ('epsilon', c_double),
 				('sigma', c_double), ('box', c_double), ('rcut', c_double),
@@ -18,6 +13,38 @@ class mdsys_t(Structure):
 				('rx', POINTER(c_double)), ('ry', POINTER(c_double)), ('rz', POINTER(c_double)), 
 				('vx', POINTER(c_double)), ('vy', POINTER(c_double)), ('vz', POINTER(c_double)), 
 				('fx', POINTER(c_double)), ('fy', POINTER(c_double)), ('fz', POINTER(c_double))]
+	
 
-read_input("examples/argon_108.inp")
+
+
+class LJMD:
+	def __init__(self, input_file):
+		self.time_step = 0
+
+		input_data = read_input(input_file)
+
+		self.initialize_values(input_data)
+
+	
+
+	def initialize_values(self, data)
+		self.sys = MDSYS_T(natoms=data[0],
+							mass=data[1],
+							epsilon=data[2],
+							sigma=data[3],
+							rcut=data[4],
+							box=data[5],
+							restfile=data[6],
+							trajfile=data[7],
+							ergfile=data[8],
+							nsteps=data[9],
+							dt=data[10],
+							nprint=data[11])
+
+	def read_input(self, datafile):
+		with open(datafile) as f:
+			data = f.read()
+			print(data)
+
+
 #my_functions.mdsys_t
