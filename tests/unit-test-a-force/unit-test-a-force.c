@@ -12,7 +12,7 @@
 #define BOX 17.1580
 
 #define FREF (-24.0 * EPSILON / SIGMA)
-#define TOL 1e-14
+#define TOL 1e-7
 #define TEST_SUCCESS 0
 #define TEST_FAILED -1
 

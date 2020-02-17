@@ -56,7 +56,7 @@ void force(mdsys_t *sys) {
         double rinv2 = 1.0 / rsq;
         double rinv6 = POW3(rinv2);
         ffac = (12.0 * c12 * rinv6 - 6.0 * c6) * rinv6 * rinv2;
-        sys->epot += rinv6 * (c12 * rinv6 - c6); 
+        sys->epot += 0.5 * rinv6 * (c12 * rinv6 - c6); 
 
         sys->fx[i] += rx * ffac; 
         sys->fy[i] += ry * ffac; 
