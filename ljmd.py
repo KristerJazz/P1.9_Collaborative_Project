@@ -140,14 +140,14 @@ class LJMD:
 			print("Missing input file: Please provide correct file path")
 			raise
 
-		assert(len(data)==12), "Invalid input file: File should have 12 rows of values"
+		assert(len(data)==12), "Invalid input file: File should have 12 rows of input values"
 
 		return data
 	
 	def restart(self, restfile):
 		with open(restfile) as f:
 			r = f.readlines()
-			assert(len(r)==2*self.natoms), "Invalid restart file: File should have rows equal to twice the number of atoms"
+			assert(len(r)==2*self.natoms), "Invalid restart file: File should have rows equal to twice the number of atoms\n"
 			for i in range(self.natoms):
 				self.sys.rx[i] = float(r[i].split()[0])
 				self.sys.ry[i] = float(r[i].split()[1])
@@ -158,20 +158,12 @@ class LJMD:
 				self.sys.vy[i] = float(r[i+self.natoms].split()[1])
 				self.sys.vz[i] = float(r[i+self.natoms].split()[2])
 
-	def go(self):
-		for i in range(self.natoms):
-			print(self.sys.rx[i])
-
-
 if __name__ == '__main__':
-	input_path = "examples/"+sys.argv[1]
-	output_path = "examples/"
-	print(input_path)
+	input_path = sys.argv[1]
 	so_path = "lib/libljmd.so"
-	#input_path = "examples/argon_108.inp"
-	#input_path = 'argon_108.dat'
+
 	main = LJMD(so_path)
+
 	main.initialize_system(input_path)
 	main.run_simulation()
-	#main.go()
 	
