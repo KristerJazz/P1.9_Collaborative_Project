@@ -15,19 +15,17 @@ class MDSYS_T(Structure):
 				('fx', POINTER(c_double)), ('fy', POINTER(c_double)), ('fz', POINTER(c_double))]
 	
 
-
-
 class LJMD:
 	def __init__(self, input_file):
 		self.time_step = 0
 
-		input_data = read_input(input_file)
+		input_data = self.read_input(input_file)
 
-		self.initialize_values(input_data)
+		#self.initialize_values(input_data)
 
 	
 
-	def initialize_values(self, data)
+	def initialize_values(self, data):
 		self.sys = MDSYS_T(natoms=data[0],
 							mass=data[1],
 							epsilon=data[2],
@@ -43,8 +41,8 @@ class LJMD:
 
 	def read_input(self, datafile):
 		with open(datafile) as f:
-			data = f.read()
+			data = [x.split(' ')[0] for x in f.readlines()] 
 			print(data)
 
 
-#my_functions.mdsys_t
+main = LJMD("examples/argon_108.inp")
