@@ -52,7 +52,6 @@ int get_a_line(FILE *fp, char *buf);
  */
 void azzero(double *d, const int n);
 
-double pbc(double x, const double boxby2);
 /**
  * @brief helper function: apply minimum image convention
  */

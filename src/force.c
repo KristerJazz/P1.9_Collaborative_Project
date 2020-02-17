@@ -19,7 +19,7 @@
 #define POW12(x) (POW6(x) * POW6(x))
 
 /* helper function: apply minimum image convention */
-double pbc(double x, const double boxby2) {
+inline double pbc(double x, const double boxby2) {
   while (x > boxby2) x -= 2.0 * boxby2;
   while (x < -boxby2) x += 2.0 * boxby2;
   return x;
@@ -40,8 +40,8 @@ void force(mdsys_t *sys) {
   double c6 = 4.0 * sys->epsilon * POW6(sys->sigma);
   double rcsq = POW2(sys->rcut);
 
-  for (i = 0; i < (sys->natoms); ++i) {
-    for (j = 0; j < (sys->natoms); ++j) {
+  for (i = 0; i < (sys->natoms) - 1; ++i) {
+    for (j = i + 1; j < (sys->natoms); ++j) {
 
       if (i == j) continue;
 
@@ -56,11 +56,11 @@ void force(mdsys_t *sys) {
         double rinv2 = 1.0 / rsq;
         double rinv6 = POW3(rinv2);
         ffac = (12.0 * c12 * rinv6 - 6.0 * c6) * rinv6 * rinv2;
-        sys->epot += 0.5 * rinv6 * (c12 * rinv6 - c6); 
+        sys->epot += rinv6 * (c12 * rinv6 - c6); 
 
-        sys->fx[i] += rx * ffac; 
-        sys->fy[i] += ry * ffac; 
-        sys->fz[i] += rz * ffac; 
+        sys->fx[i] += rx * ffac; sys->fx[j] -= rx * ffac;
+        sys->fy[i] += ry * ffac; sys->fy[j] -= ry * ffac;
+        sys->fz[i] += rz * ffac; sys->fz[j] -= rz * ffac;
       }
     }
   }
