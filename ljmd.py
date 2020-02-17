@@ -97,14 +97,14 @@ class LJMD:
 			for i in range(self.natoms):
 				self.sys.rx[0] = float(r[i].split()[0])
 				self.sys.ry[0] = float(r[i].split()[1])
-				self.sys.rx[0] = float(r[i].split()[2])
+				self.sys.rz[0] = float(r[i].split()[2])
 
-			#for i in range(self.natoms):
-			#	v = f.readlines()
-			#	self.sys.vx[0] = v.split()[0]
-			#	self.sys.vy[0] = v.split()[1]
-			#	self.sys.vx[0] = v.split()[2]
-	
+			for i in range(self.natoms):
+				self.sys.vx[0] = float(r[i+self.natoms].split()[0])
+				self.sys.vy[0] = float(r[i+self.natoms].split()[1])
+				self.sys.vz[0] = float(r[i+self.natoms].split()[2])
+
+
 
 	def go(self):
 		print(self.sys.fx[0])
