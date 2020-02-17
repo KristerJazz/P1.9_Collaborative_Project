@@ -1,3 +1,9 @@
+"""
+Python wrapper for LJMD C code
+
+Author: Krister Jazz Urog
+Date: 17 February, 2020
+"""
 from ctypes import *
 
 class MDSYS_T(Structure):
@@ -98,9 +104,6 @@ class LJMD:
 			#	self.sys.vx[0] = v.split()[0]
 			#	self.sys.vy[0] = v.split()[1]
 			#	self.sys.vx[0] = v.split()[2]
-
-
-
 	
 
 	def go(self):
