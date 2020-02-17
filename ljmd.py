@@ -19,30 +19,51 @@ class LJMD:
 	def __init__(self, input_file):
 		self.time_step = 0
 
-		input_data = self.read_input(input_file)
+		data = self.read_input(input_file)
 
-		#self.initialize_values(input_data)
+		self.natoms=int(data[0])
+		self.mass=float(data[1])
+		self.epsilon=float(data[2])
+		self.sigma=float(data[3])
+		self.rcut=float(data[4])
+		self.box=float(data[5])
+		self.restfile=data[6]
+		self.trajfile=data[7]
+		self.ergfile=data[8]
+		self.nsteps=int(data[9])
+		self.dt=float(data[10])
+		self.nprint=int(data[11])
 
+		self.initialize_system()
+
+	def initialize_system(self):
+		
+		self.sys = MDSYS_T(natoms=self.natoms,
+							nfi=0,
+							mass=self.mass,
+							epsilon=self.epsilon,
+							sigma=self.sigma,
+							rcut=self.rcut,
+							box=self.box,
+							nsteps = self.nsteps,
+							dt=self.dt)
 	
+	def force(self):
+		ljmd.force(byref(self.sys))
 
-	def initialize_values(self, data):
-		self.sys = MDSYS_T(natoms=data[0],
-							mass=data[1],
-							epsilon=data[2],
-							sigma=data[3],
-							rcut=data[4],
-							box=data[5],
-							restfile=data[6],
-							trajfile=data[7],
-							ergfile=data[8],
-							nsteps=data[9],
-							dt=data[10],
-							nprint=data[11])
+	def ekin(self):
+		ljmd.ekin(byref(self.sys))
+		
+		
+
+
 
 	def read_input(self, datafile):
 		with open(datafile) as f:
 			data = [x.split(' ')[0] for x in f.readlines()] 
 			print(data)
+
+		return data
 
 
 main = LJMD("examples/argon_108.inp")
