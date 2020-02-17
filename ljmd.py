@@ -36,7 +36,11 @@ class MDSYS_T(Structure):
 
 class LJMD:
 	def __init__(self, so_file):
-		self._ljmd = CDLL(so_file)
+		try:
+			self._ljmd = CDLL(so_file)
+		except:
+			print("Please use the valid LJMD shared object file")
+			raise
 
 	def initialize_system(self, input_file):
 		data = self.read_input(input_file)
@@ -129,14 +133,21 @@ class LJMD:
          		   			self.sys.rz[i]))
 
 	def read_input(self, datafile):
-		with open(datafile) as f:
-			data = [x.split()[0] for x in f.readlines()] 
+		try:
+			with open(datafile) as f:
+				data = [x.split()[0] for x in f.readlines()] 
+		except FileNotFoundError:
+			print("Missing input file: Please provide correct file path")
+			raise
+
+		assert(len(data)==12), "Invalid input file: File should have 12 rows of values"
 
 		return data
 	
 	def restart(self, restfile):
 		with open(restfile) as f:
 			r = f.readlines()
+			assert(len(r)==2*self.natoms), "Invalid restart file: File should have rows equal to twice the number of atoms"
 			for i in range(self.natoms):
 				self.sys.rx[i] = float(r[i].split()[0])
 				self.sys.ry[i] = float(r[i].split()[1])
@@ -158,7 +169,9 @@ if __name__ == '__main__':
 	print(input_path)
 	so_path = "lib/libljmd.so"
 	#input_path = "examples/argon_108.inp"
+	#input_path = 'argon_108.dat'
 	main = LJMD(so_path)
 	main.initialize_system(input_path)
 	main.run_simulation()
 	#main.go()
+	
