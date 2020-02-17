@@ -92,7 +92,14 @@ class LJMD:
 		while self.sys.nfi <= self.sys.nsteps:
 			if (self.sys.nfi%self.nprint)==0:
 				erg.write("% 8d % 20.8f % 20.8f % 20.8f % 20.8f\n" % (self.sys.nfi, self.sys.temp,
-         self.sys.ekin, self.sys.epot, self.sys.ekin + self.sys.epot))
+         					self.sys.ekin, self.sys.epot, self.sys.ekin + self.sys.epot))
+
+				traj.write("%d\n nfi=%d etot=%20.8f\n" % (self.sys.natoms, self.sys.nfi, 
+							self.sys.ekin + self.sys.epot))
+				for i in range(self.natoms):
+					traj.write("Ar  %20.8f %20.8f %20.8f\n" % (self.sys.rx[i], self.sys.ry[i],
+            					self.sys.rz[i]))
+
 			self._ljmd.velverlet(byref(self.sys))
 			self._ljmd.ekin(byref(self.sys))
 			self.sys.nfi+=1
