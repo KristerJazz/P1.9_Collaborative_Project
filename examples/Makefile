@@ -9,7 +9,7 @@ PERF_SAMPLE=argon_108.inp
 default: check
 
 clean:
-	rm -f *.xyz *.dat $(PERF_PATH)/*.data $(PERF_RESULT)
+	rm -f *.xyz *.dat $(PERF_PATH)/*.data $(PERF_RESULT) $(PERF_PATH)/perfstat.txt
 
 check: $(EXE)
 	$(EXE) < argon_108.inp
@@ -26,6 +26,7 @@ perf: $(EXE) $(PERF_RESULT)
 
 $(PERF): $(EXE)
 	perf record -o $(PERF) -T -B $(EXE) < $(PERF_SAMPLE)
+	perf stat $(EXE) < $(PERF_SAMPLE) -o $(PERF_PATH)/perfstat.txt
 
 $(PERF_RESULT): $(PERF)
 	perf report -i $(PERF)
