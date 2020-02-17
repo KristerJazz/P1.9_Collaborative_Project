@@ -63,24 +63,25 @@ class LJMD:
 		self.force()
 		self.ekin()
 		self.sys.nfi = 0
+	def run_simulation(self):
+		print("Running simulation")
+
+		while self.sys.nfi < self.sys.nsteps:
+			self._ljmd.velverlet(byref(self.sys))
+			self._ljmd.ekin(byref(self.sys))
+			self.sys.nfi+=1
+			
+		print("Done simulation")
 	
 	def force(self):
-		print("The force awakens")
+		print("The force awakens, (Force initialized)")
 		self._ljmd.force(byref(self.sys))
 	
 	def ekin(self):
-		print("Ekin")
+		print("Ekin initialize")
 		self._ljmd.ekin(byref(self.sys))
 
-	def run(self):
-		print("Running simulation")
-
-		while self.sys.nfi < self.nsteps:
-			self._ljmd.velverlet(byref(self.sys))
-			self._ljmd.ekin(byref(self.sys))
-			
-		print("Done simulation")
-		
+	
 	def read_input(self, datafile):
 		with open(datafile) as f:
 			data = [x.split(' ')[0] for x in f.readlines()] 
@@ -112,4 +113,4 @@ class LJMD:
 
 
 main = LJMD("examples/argon_108.inp", ljmd)
-main.go()
+main.run_simulation()
