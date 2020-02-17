@@ -16,23 +16,24 @@ class MDSYS_T(Structure):
 	
 
 class LJMD:
-	def __init__(self, input_file):
+	def __init__(self, input_file, cdll):
+		self._ljmd = cdll
 		self.time_step = 0
 
 		data = self.read_input(input_file)
 
-		self.natoms=int(data[0])
-		self.mass=float(data[1])
-		self.epsilon=float(data[2])
-		self.sigma=float(data[3])
-		self.rcut=float(data[4])
-		self.box=float(data[5])
-		self.restfile=data[6]
-		self.trajfile=data[7]
-		self.ergfile=data[8]
-		self.nsteps=int(data[9])
-		self.dt=float(data[10])
-		self.nprint=int(data[11])
+		self.natoms = int(data[0])
+		self.mass = float(data[1])
+		self.epsilon = float(data[2])
+		self.sigma = float(data[3])
+		self.rcut = float(data[4])
+		self.box = float(data[5])
+		self.restfile = data[6]
+		self.trajfile = data[7]
+		self.ergfile = data[8]
+		self.nsteps = int(data[9])
+		self.dt = float(data[10])
+		self.nprint = int(data[11])
 
 		self.initialize_system()
 
@@ -57,16 +58,21 @@ class LJMD:
 		self.sys.fy = (c_double*self.natoms)()
 		self.sys.fz = (c_double*self.natoms)()
 
-		self.sys.nfi = 0
 
 		data = self.read_restart("examples/"+self.restfile)
 		print(data.split(' ')[0])
 
 		self.force()
+		self.sys.nfi = 0
 	
 	def force(self):
 		print("The force awakens")
-		ljmd.force(byref(self.sys))
+		self._ljmd.force(byref(self.sys))
+	
+#	def zero_force(self):
+#		self._ljmd.azzero(byref(self.sys.fx), c_int(self.natoms))
+#		print("Force zeroed out")
+#		pass
 
 	def ekin(self):
 		ljmd.ekin(byref(self.sys))
@@ -101,5 +107,5 @@ class LJMD:
 		#		print(self.sys.nfi)
 
 
-main = LJMD("examples/argon_108.inp")
+main = LJMD("examples/argon_108.inp", ljmd)
 main.go()
