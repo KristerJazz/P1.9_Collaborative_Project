@@ -5,6 +5,7 @@ Author: Krister Jazz Urog
 Date: 17 February, 2020
 """
 from ctypes import *
+import sys
 
 class MDSYS_T(Structure):
 	"""
@@ -32,6 +33,7 @@ class MDSYS_T(Structure):
 				('rx', POINTER(c_double)), ('ry', POINTER(c_double)), ('rz', POINTER(c_double)), 
 				('vx', POINTER(c_double)), ('vy', POINTER(c_double)), ('vz', POINTER(c_double)), 
 				('fx', POINTER(c_double)), ('fy', POINTER(c_double)), ('fz', POINTER(c_double))] 
+
 class LJMD:
 	def __init__(self, so_file, input_file):
 		self._ljmd = CDLL(so_file)
@@ -81,17 +83,24 @@ class LJMD:
 		self.ekin()
 		self.sys.nfi = 0
 
-		self._ljmd
 	def run_simulation(self):
 		print("Running simulation")
 
-		while self.sys.nfi < self.sys.nsteps:
+		erg = open(self.ergfile, 'w')
+		traj = open(self.trajfile, 'w')
+
+		while self.sys.nfi <= self.sys.nsteps:
+			if (self.sys.nfi%self.nprint)==0:
+				erg.write("% 8d % 20.8f % 20.8f % 20.8f % 20.8f\n" % (self.sys.nfi, self.sys.temp,
+         self.sys.ekin, self.sys.epot, self.sys.ekin + self.sys.epot))
 			self._ljmd.velverlet(byref(self.sys))
 			self._ljmd.ekin(byref(self.sys))
 			self.sys.nfi+=1
 			
 		print("Done simulation")
-	
+		
+		erg.close()
+		traj.close()
 	def force(self):
 		print("The force awakens, (Force initialized)")
 		self._ljmd.force(byref(self.sys))
@@ -110,18 +119,25 @@ class LJMD:
 		with open(restfile) as f:
 			r = f.readlines()
 			for i in range(self.natoms):
-				self.sys.rx[0] = float(r[i].split()[0])
-				self.sys.ry[0] = float(r[i].split()[1])
-				self.sys.rz[0] = float(r[i].split()[2])
+				self.sys.rx[i] = float(r[i].split()[0])
+				self.sys.ry[i] = float(r[i].split()[1])
+				self.sys.rz[i] = float(r[i].split()[2])
 
 			for i in range(self.natoms):
-				self.sys.vx[0] = float(r[i+self.natoms].split()[0])
-				self.sys.vy[0] = float(r[i+self.natoms].split()[1])
-				self.sys.vz[0] = float(r[i+self.natoms].split()[2])
+				self.sys.vx[i] = float(r[i+self.natoms].split()[0])
+				self.sys.vy[i] = float(r[i+self.natoms].split()[1])
+				self.sys.vz[i] = float(r[i+self.natoms].split()[2])
+
+	def go(self):
+		for i in range(self.natoms):
+			print(self.sys.rx[i])
 
 
 if __name__ == '__main__':
+	input_path = "examples/"+sys.argv[1]
+	print(input_path)
 	so_path = "lib/libljmd.so"
-	input_path = "examples/argon_108.inp"
+	#input_path = "examples/argon_108.inp"
 	main = LJMD(so_path, input_path)
 	main.run_simulation()
+	#main.go()
