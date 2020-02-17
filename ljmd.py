@@ -154,7 +154,7 @@ class LJMD:
             raise
 
         assert(
-            len(data) == 12),
+            len(data) == 12),\
 			"Invalid input file: File should have 12 rows of input values"
 
         return data
@@ -163,7 +163,7 @@ class LJMD:
         with open(restfile) as f:
             r = f.readlines()
             assert(
-                len(r) == 2 * self.natoms),
+                len(r) == 2 * self.natoms),\
 				"Invalid restart file: File should have rows equal to twice the number of atoms\n"
 
             for i in range(self.natoms):
