@@ -1,10 +1,5 @@
 from ctypes import *
 
-so_files = "lib/libljmd.so"
-
-ljmd = CDLL(so_files)
-
-
 class MDSYS_T(Structure):
 	_fields_ = [('natoms', c_int), ('nfi', c_int), ('nsteps', c_int),
 				('dt', c_double), ('mass', c_double), ('epsilon', c_double),
@@ -16,8 +11,8 @@ class MDSYS_T(Structure):
 	
 
 class LJMD:
-	def __init__(self, input_file, cdll):
-		self._ljmd = cdll
+	def __init__(self, so_file, input_file):
+		self._ljmd = CDLL(so_file)
 		self.time_step = 0
 
 		data = self.read_input(input_file)
@@ -63,6 +58,8 @@ class LJMD:
 		self.force()
 		self.ekin()
 		self.sys.nfi = 0
+
+		self._ljmd
 	def run_simulation(self):
 		print("Running simulation")
 
@@ -112,5 +109,7 @@ class LJMD:
 		#		print(self.sys.nfi)
 
 
-main = LJMD("examples/argon_108.inp", ljmd)
+so_path = "lib/libljmd.so"
+input_path = "examples/argon_108.inp"
+main = LJMD(so_path, input_path)
 main.run_simulation()
