@@ -53,6 +53,11 @@ int get_a_line(FILE *fp, char *buf);
 void azzero(double *d, const int n);
 
 /**
+ * @brief helper function: apply minimum image convention
+ */
+//extern inline double pbc(double x, const double boxby2);
+
+/**
  * @brief compute kinetic energy
  */
 void ekin(mdsys_t *sys);
