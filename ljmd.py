@@ -59,8 +59,7 @@ class LJMD:
 		self.sys.fz = (c_double*self.natoms)()
 
 
-		data = self.read_restart("examples/"+self.restfile)
-		print(data.split(' ')[0])
+		self.restart("examples/"+self.restfile)
 
 		self.force()
 		self.sys.nfi = 0
@@ -75,34 +74,34 @@ class LJMD:
 #		pass
 
 	def ekin(self):
-		ljmd.ekin(byref(self.sys))
+		self._ljmd.ekin(byref(self.sys))
 
 	def run(self):
 		print("Running simulation")
 
 		while self.sys.nfi < self.nsteps:
-			ljmd.velverlet(byref(self.sys))
-			ljmd.ekin(byref(self.sys))
+			self._ljmd.velverlet(byref(self.sys))
+			self._ljmd.ekin(byref(self.sys))
 			
 		print("Done simulation")
 		
 	def read_input(self, datafile):
 		with open(datafile) as f:
 			data = [x.split(' ')[0] for x in f.readlines()] 
-			#print(data)
 
 		return data
 	
-	def read_restart(self, restfile):
+	def restart(self, restfile):
 		with open(restfile) as f:
-			data = f.read()
+			for x in f.readlines():
+				
 
-		return data
+		#return data
 			
 	
 
 	def go(self):
-		print(self.sys.fx[0])
+		print(self.sys.natoms)
 		#for i in range(self.nsteps):
 		#		print(self.sys.nfi)
 
