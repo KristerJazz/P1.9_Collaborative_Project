@@ -8,9 +8,3 @@ void azzero(double *d, const int n) {
   }
 }
 
-/* helper function: apply minimum image convention */
-inline double pbc(double x, const double boxby2) {
-  while (x > boxby2) x -= 2.0 * boxby2;
-  while (x < -boxby2) x += 2.0 * boxby2;
-  return x;
-}

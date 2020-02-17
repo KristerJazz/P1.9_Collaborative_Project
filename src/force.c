@@ -18,6 +18,13 @@
 #define POW6(x) (POW2(x) * POW2(x) * POW2(x))
 #define POW12(x) (POW6(x) * POW6(x))
 
+/* helper function: apply minimum image convention */
+inline double pbc(double x, const double boxby2) {
+  while (x > boxby2) x -= 2.0 * boxby2;
+  while (x < -boxby2) x += 2.0 * boxby2;
+  return x;
+}
+
 void force(mdsys_t *sys) {
   double ffac;
   double rx, ry, rz;
