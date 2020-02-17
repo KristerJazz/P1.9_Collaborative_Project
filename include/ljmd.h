@@ -55,7 +55,7 @@ void azzero(double *d, const int n);
 /**
  * @brief helper function: apply minimum image convention
  */
-double pbc(double x, const double boxby2);
+inline double pbc(double x, const double boxby2);
 
 /**
  * @brief compute kinetic energy
