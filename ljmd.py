@@ -69,6 +69,7 @@ class LJMD:
 		self._ljmd.force(byref(self.sys))
 	
 	def ekin(self):
+		print("Ekin")
 		self._ljmd.ekin(byref(self.sys))
 
 	def run(self):
