@@ -47,37 +47,59 @@ class LJMD:
 							nsteps = self.nsteps,
 							dt=self.dt)
 
-		self.doubles = (c_double*self.natoms)()
+		self.sys.rx = (c_double*self.natoms)()
+		self.sys.ry = (c_double*self.natoms)()
+		self.sys.rz = (c_double*self.natoms)()
+		self.sys.vx = (c_double*self.natoms)()
+		self.sys.vy = (c_double*self.natoms)()
+		self.sys.vz = (c_double*self.natoms)()
+		self.sys.fx = (c_double*self.natoms)()
+		self.sys.fy = (c_double*self.natoms)()
+		self.sys.fz = (c_double*self.natoms)()
 
+		self.sys.nfi = 0
+
+		data = self.read_restart("examples/"+self.restfile)
+		print(data.split(' ')[0])
 
 		self.force()
 	
 	def force(self):
+		print("The force awakens")
 		ljmd.force(byref(self.sys))
 
 	def ekin(self):
 		ljmd.ekin(byref(self.sys))
 
-
-
 	def run(self):
 		print("Running simulation")
 
-		while self.nfi < self.nsteps:
+		while self.sys.nfi < self.nsteps:
 			ljmd.velverlet(byref(self.sys))
 			ljmd.ekin(byref(self.sys))
 			
 		print("Done simulation")
 		
-
-
-
 	def read_input(self, datafile):
 		with open(datafile) as f:
 			data = [x.split(' ')[0] for x in f.readlines()] 
 			#print(data)
 
 		return data
+	
+	def read_restart(self, restfile):
+		with open(restfile) as f:
+			data = f.read()
+
+		return data
+			
+	
+
+	def go(self):
+		print(self.sys.fx[0])
+		#for i in range(self.nsteps):
+		#		print(self.sys.nfi)
 
 
 main = LJMD("examples/argon_108.inp")
+main.go()
