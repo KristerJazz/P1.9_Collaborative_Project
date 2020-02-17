@@ -104,14 +104,6 @@ class LJMD:
 				self.sys.vy[0] = float(r[i+self.natoms].split()[1])
 				self.sys.vz[0] = float(r[i+self.natoms].split()[2])
 
-
-
-	def go(self):
-		print(self.sys.fx[0])
-		#for i in range(self.nsteps):
-		#		print(self.sys.nfi)
-
-
 so_path = "lib/libljmd.so"
 input_path = "examples/argon_108.inp"
 main = LJMD(so_path, input_path)
