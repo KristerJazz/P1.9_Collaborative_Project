@@ -104,7 +104,9 @@ class LJMD:
 				self.sys.vy[0] = float(r[i+self.natoms].split()[1])
 				self.sys.vz[0] = float(r[i+self.natoms].split()[2])
 
-so_path = "lib/libljmd.so"
-input_path = "examples/argon_108.inp"
-main = LJMD(so_path, input_path)
-main.run_simulation()
+
+if __name__ == '__main__':
+	so_path = "lib/libljmd.so"
+	input_path = "examples/argon_108.inp"
+	main = LJMD(so_path, input_path)
+	main.run_simulation()
