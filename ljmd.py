@@ -58,21 +58,16 @@ class LJMD:
 		self.sys.fy = (c_double*self.natoms)()
 		self.sys.fz = (c_double*self.natoms)()
 
-
 		self.restart("examples/"+self.restfile)
 
 		self.force()
+		self.ekin()
 		self.sys.nfi = 0
 	
 	def force(self):
 		print("The force awakens")
 		self._ljmd.force(byref(self.sys))
 	
-#	def zero_force(self):
-#		self._ljmd.azzero(byref(self.sys.fx), c_int(self.natoms))
-#		print("Force zeroed out")
-#		pass
-
 	def ekin(self):
 		self._ljmd.ekin(byref(self.sys))
 
@@ -93,15 +88,24 @@ class LJMD:
 	
 	def restart(self, restfile):
 		with open(restfile) as f:
-			for x in f.readlines():
-				
+			r = f.readlines()
+			for i in range(self.natoms):
+				self.sys.rx[0] = float(r[i].split()[0])
+				self.sys.ry[0] = float(r[i].split()[1])
+				self.sys.rx[0] = float(r[i].split()[2])
 
-		#return data
-			
+			#for i in range(self.natoms):
+			#	v = f.readlines()
+			#	self.sys.vx[0] = v.split()[0]
+			#	self.sys.vy[0] = v.split()[1]
+			#	self.sys.vx[0] = v.split()[2]
+
+
+
 	
 
 	def go(self):
-		print(self.sys.natoms)
+		print(self.sys.fx[0])
 		#for i in range(self.nsteps):
 		#		print(self.sys.nfi)
 
