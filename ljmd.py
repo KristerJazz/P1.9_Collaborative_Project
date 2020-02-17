@@ -14,14 +14,14 @@ class MDSYS_T(Structure):
 	-----------------------------------------------
 	Parameters:
 		natoms = number of atoms
-		nfi = number of iterations
-		nsteps = number of simulation steps
+		nfi = current iteration step
+		nsteps = total number of iteration steps
 		dt = time step
 		mass = mass of atom
-		epsilon =
-		sigma = 
-		box =
-		rcut =
+		epsilon = constant
+		sigma =  constant
+		box = box size
+		rcut = cutoff threshold distance
 		ekin = Kinetic energy 
 		epot = Potential energy
 		temp = Temperature
@@ -81,7 +81,7 @@ class LJMD:
 
 		self.force()
 		self.ekin()
-		self.sys.nfi = 0
+		self.sys.nfi = 1
 
 	def run_simulation(self):
 		print("Running simulation")
@@ -108,6 +108,9 @@ class LJMD:
 		
 		erg.close()
 		traj.close()
+	
+
+
 	def force(self):
 		print("The force awakens, (Force initialized)")
 		self._ljmd.force(byref(self.sys))
