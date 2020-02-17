@@ -13,8 +13,13 @@
 
 #include "ljmd.h"
 
+#define POW2(x) ((x) * (x))
+#define POW3(x) (POW2(x) * (x))
+#define POW6(x) (POW2(x) * POW2(x) * POW2(x))
+#define POW12(x) (POW6(x) * POW6(x))
+
 void force(mdsys_t *sys) {
-  double r, ffac;
+  double ffac;
   double rx, ry, rz;
   int i, j;
 
@@ -24,29 +29,28 @@ void force(mdsys_t *sys) {
   azzero(sys->fy, sys->natoms);
   azzero(sys->fz, sys->natoms);
 
-  for (i = 0; i < (sys->natoms); ++i) {
-    for (j = 0; j < (sys->natoms); ++j) {
-      /* particles have no interactions with themselves */
-      if (i == j) continue;
+  double c12 = 4.0 * sys->epsilon * POW12(sys->sigma);
+  double c6 = 4.0 * sys->epsilon * POW6(sys->sigma);
+  double rcsq = POW2(sys->rcut);
+  for (i = 0; i < (sys->natoms) - 1; ++i) {
+    for (j = i + 1; j < (sys->natoms); ++j) {
 
       /* get distance between particle i and j */
       rx = pbc(sys->rx[i] - sys->rx[j], 0.5 * sys->box);
       ry = pbc(sys->ry[i] - sys->ry[j], 0.5 * sys->box);
       rz = pbc(sys->rz[i] - sys->rz[j], 0.5 * sys->box);
-      r = sqrt(rx * rx + ry * ry + rz * rz);
+      double rsq = POW2(rx) + POW2(ry) + POW2(rz);
 
       /* compute force and energy if within cutoff */
-      if (r < sys->rcut) {
-        ffac = -4.0 * sys->epsilon *
-               (-12.0 * pow(sys->sigma / r, 12.0) / r +
-                6 * pow(sys->sigma / r, 6.0) / r);
+      if (rsq < rcsq) {
+        double rinv2 = 1.0 / rsq;
+        double rinv6 = POW3(rinv2);
+        ffac = (12.0 * c12 * rinv6 - 6.0 * c6) * rinv6 * rinv2;
+        sys->epot += rinv6 * (c12 * rinv6 - c6); 
 
-        sys->epot += 0.5 * 4.0 * sys->epsilon *
-                     (pow(sys->sigma / r, 12.0) - pow(sys->sigma / r, 6.0));
-
-        sys->fx[i] += rx / r * ffac;
-        sys->fy[i] += ry / r * ffac;
-        sys->fz[i] += rz / r * ffac;
+        sys->fx[i] += rx * ffac; sys->fx[j] -= rx * ffac;
+        sys->fy[i] += ry * ffac; sys->fy[j] -= ry * ffac;
+        sys->fz[i] += rz * ffac; sys->fz[j] -= rz * ffac;
       }
     }
   }
