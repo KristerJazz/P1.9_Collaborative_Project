@@ -39,7 +39,6 @@ class LJMD:
 	def initialize_system(self):
 		
 		self.sys = MDSYS_T(natoms=self.natoms,
-							nfi=0,
 							mass=self.mass,
 							epsilon=self.epsilon,
 							sigma=self.sigma,
@@ -47,13 +46,28 @@ class LJMD:
 							box=self.box,
 							nsteps = self.nsteps,
 							dt=self.dt)
+
+		self.doubles = (c_double*self.natoms)()
+
+
+		self.force()
 	
 	def force(self):
 		ljmd.force(byref(self.sys))
 
 	def ekin(self):
 		ljmd.ekin(byref(self.sys))
-		
+
+
+
+	def run(self):
+		print("Running simulation")
+
+		while self.nfi < self.nsteps:
+			ljmd.velverlet(byref(self.sys))
+			ljmd.ekin(byref(self.sys))
+			
+		print("Done simulation")
 		
 
 
@@ -61,7 +75,7 @@ class LJMD:
 	def read_input(self, datafile):
 		with open(datafile) as f:
 			data = [x.split(' ')[0] for x in f.readlines()] 
-			print(data)
+			#print(data)
 
 		return data
 
