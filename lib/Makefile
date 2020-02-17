@@ -3,8 +3,12 @@ include ../Rules.mk
 
 SHELL=/bin/sh
 CC=gcc
-CFLAGS=-Wall -g -O3 -ffast-math -fomit-frame-pointer -fopenmp -I$(HEADER_PATH)
+CFLAGS:=-Wall -g -O3 -ffast-math -fomit-frame-pointer -I$(HEADER_PATH)
 LDLIBS=-lm
+
+ifeq ("$(origin WITH_OMP)", "command line")
+CFLAGS+=-fopenmp
+endif
 
 # list of source files
 SRC=$(wildcard $(SRC_PATH)/*.c)

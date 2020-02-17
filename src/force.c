@@ -29,8 +29,7 @@ inline double pbc(double x, const double boxby2) {
 
 void force(mdsys_t *sys) {
   double epot;
-  
-  omp_lock_t * writelock;
+
   epot = 0;
 
   /* zero energy and forces */
@@ -43,11 +42,14 @@ void force(mdsys_t *sys) {
   double c6 = 4.0 * sys->epsilon * POW6(sys->sigma);
   double rcsq = POW2(sys->rcut);
 
+#ifdef _OPENMP
+  omp_lock_t * writelock;
   writelock = (omp_lock_t *) malloc(sys->natoms * sizeof(omp_lock_t));
-
-  int k = 0;
+#endif
 
   /* Initialise the locks */
+#ifdef _OPENMP
+  int k = 0;
 #pragma omp parallel
 {
   
@@ -59,17 +61,26 @@ void force(mdsys_t *sys) {
 
 #pragma omp parallel reduction(+:epot)
 {
+#endif
+
   int i, j;
+#ifdef _OPENMP
   int tid = omp_get_thread_num();
   int tsize = omp_get_num_threads();
+#else
+  int tid = 0;
+  int tsize = 1;
+#endif
 
   for (i = tid; i < (sys->natoms) - 1; i += tsize) {
 
     double rx, ry, rz;
-    double fx, fy, fz;
     double ffac;
 
+#ifdef _OPENMP
+    double fx, fy, fz;
     fx = 0; fy = 0; fz = 0;
+#endif
 
     for (j = i + 1; j < (sys->natoms); ++j) {
 
@@ -91,33 +102,42 @@ void force(mdsys_t *sys) {
 
         epot += rinv6 * (c12 * rinv6 - c6); 
 
+#ifdef _OPENMP
         fx += rx * ffac; 
         fy += ry * ffac; 
         fz += rz * ffac; 
-
         omp_set_lock(&writelock[j]);
+#else
+        sys->fx[i] += rx * ffac; 
+        sys->fy[i] += ry * ffac; 
+        sys->fz[i] += rz * ffac; 
+#endif
         sys->fx[j] -= rx * ffac;
         sys->fy[j] -= ry * ffac;
         sys->fz[j] -= rz * ffac;
+#ifdef _OPENMP
         omp_unset_lock(&writelock[j]);
+#endif
 
       }
     }
-
+#ifdef _OPENMP
     omp_set_lock(&writelock[i]);
     sys->fx[i] += fx;
     sys->fy[i] += fy;
     sys->fz[i] += fz;
     omp_unset_lock(&writelock[i]);
-    
   }
+#endif
 }
   sys->epot = epot;
 
   /* Free the locks */
+#ifdef _OPENMP
 #pragma omp parallel for
   for(k = 0; k < (sys->natoms); ++k) {
     omp_destroy_lock(&writelock[k]);
   }
   free(writelock);
+#endif
 }
