@@ -4,7 +4,7 @@ from ljmd import *
 class RestartTest(unittest.TestCase):
     def setUp(self):
         so_path = "lib/libljmd.so"
-        input_path = "examples/argon_108.inp"
+        input_path = "tests/python_tests/test_inputs/test1.inp"
         self.main = LJMD(so_path)
         self.main.initialize_system(input_path)
 
@@ -17,5 +17,5 @@ class RestartTest(unittest.TestCase):
         self.assertRaises(AssertionError, self.main.restart, restart_file)
 
     def test_correct_input(self):
-        restart_file = "examples/argon_108.rest"
+        restart_file = "tests/python_tests/test_inputs/force_test1.rest"
         self.main.restart(restart_file)
