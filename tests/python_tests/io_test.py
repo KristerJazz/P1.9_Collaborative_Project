@@ -16,5 +16,5 @@ class IOtest(unittest.TestCase):
 		self.assertRaises(AssertionError, self.main.read_input, input_file)
 	
 	def test_correct_input(self):
-		input_file = "tests/python_tests/test_inputs/test.inp"
+		input_file = "tests/python_tests/test_inputs/test1.inp"
 		self.main.read_input(input_file)
