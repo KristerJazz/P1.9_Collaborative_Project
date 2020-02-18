@@ -26,8 +26,8 @@ inline double pbc(double x, const double boxby2) {
 }
 
 void force(mdsys_t *sys) {
-  
-  double epot;
+  int i,j;
+  double ffac,rx,ry,rz;
   /* zero energy and forces */
   epot = 0.0;
   azzero(sys->fx, sys->natoms);
@@ -38,12 +38,11 @@ void force(mdsys_t *sys) {
   double c6 = 4.0 * sys->epsilon * POW6(sys->sigma);
   double rcsq = POW2(sys->rcut);
  
-
+#if defined (_OPENMP)
 #pragma omp parallel reduction (+:epot)
-  {
-  double ffac,rx,ry,rz;
-  int i,j;
-#pragma omp for schedule(dynamic)
+  {  
+#pragma omp for schedule(dynamic) private(i,j,ffac,rx,ry,rz)
+#endif
   for (i = 0; i < (sys->natoms) - 1; ++i) {
     double fx_i,fy_i,fz_i;
     fx_i=fy_i=fz_i=0.0;
@@ -70,20 +69,31 @@ void force(mdsys_t *sys) {
 	fx_i += rx;
 	fy_i += ry;
 	fz_i += rz;
-	
+	#if defined (_OPENMP)
 	#pragma omp atomic
+	#endif
         sys->fx[j] -= rx;
+	#if defined (_OPENMP)
 	#pragma omp atomic
+	#endif
 	sys->fy[j] -= ry;
+	#if defined (_OPENMP)
 	#pragma	omp atomic
+	#endif
         sys->fz[j] -= rz;
           }
         }
+        #if defined (_OPENMP)
         #pragma omp atomic
+        #endif
         sys->fx[i] += fx_i;
+	#if defined (_OPENMP)
 	#pragma omp atomic
+	#endif
 	sys->fy[i] += fy_i;
+	#if defined (_OPENMP)
 	#pragma omp atomic
+	#endif
 	sys->fz[i] += fz_i;
       }
     
