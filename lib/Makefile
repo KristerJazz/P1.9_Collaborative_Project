@@ -21,12 +21,12 @@ clean:
 	rm -f *.mod *.o *.so ../*.x
 
 # linker rule
-$(EXE): $(SHARED)
+$(EXE): $(SHARED) $(HEADERS)
 	$(CC) -o $@ $(CFLAGS) $(LDLIBS) -l$(PROJECT_NAME) -L$(LIB_PATH)
 
-$(SHARED): $(OBJ) $(HEADERS)
+$(SHARED): $(OBJ)
 	$(CC) -shared -o $@ $(CFLAGS) $^ $(LDLIBS)
 
 # compilation pattern rule for objects
-%.o: $(SRC_PATH)/%.c $(HEADERS)
+%.o: $(SRC_PATH)/%.c
 	$(CC) -c $(CFLAGS) $< -fPIC

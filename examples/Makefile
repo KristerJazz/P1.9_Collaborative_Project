@@ -26,7 +26,7 @@ perf: $(EXE) $(PERF_RESULT)
 
 $(PERF): $(EXE)
 	perf record -o $(PERF) -T -B $(EXE) < $(PERF_SAMPLE)
-	perf stat $(EXE) < $(PERF_SAMPLE) -o $(PERF_PATH)/perfstat.txt
+	perf stat -o $(PERF_PATH)/perfstat.txt $(EXE) < $(PERF_SAMPLE) 
 
 $(PERF_RESULT): $(PERF)
 	perf report -i $(PERF)

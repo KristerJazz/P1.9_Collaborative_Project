@@ -43,10 +43,11 @@ void force(mdsys_t *sys) {
   {
   double ffac,rx,ry,rz;
   int i,j;
-#pragma omp for schedule(static)
+#pragma omp for schedule(dynamic)
   for (i = 0; i < (sys->natoms) - 1; ++i) {
+    double fx_i,fy_i,fz_i;
+    fx_i=fy_i=fz_i=0.0;
     for (j = i + 1; j < (sys->natoms); ++j) {
-
 
       /* get distance between particle i and j */
       rx = pbc(sys->rx[i] - sys->rx[j], 0.5 * sys->box);
@@ -65,20 +66,25 @@ void force(mdsys_t *sys) {
 	rx *=ffac;
 	ry *=ffac;
 	rz *=ffac;
+
+	fx_i += rx;
+	fy_i += ry;
+	fz_i += rz;
+	
 	#pragma omp atomic
-        sys->fx[i] += rx;
+        sys->fx[j] -= rx;
 	#pragma omp atomic
-	sys->fy[i] += ry;
-	#pragma	omp atomic
-        sys->fz[i] += rz;
-	#pragma	omp atomic
-	sys->fx[j] -= rx;
-	#pragma	omp atomic
 	sys->fy[j] -= ry;
 	#pragma	omp atomic
-	sys->fz[j] -= rz;
+        sys->fz[j] -= rz;
           }
         }
+        #pragma omp atomic
+        sys->fx[i] += fx_i;
+	#pragma omp atomic
+	sys->fy[i] += fy_i;
+	#pragma omp atomic
+	sys->fz[i] += fz_i;
       }
     
   } // end parallel region
