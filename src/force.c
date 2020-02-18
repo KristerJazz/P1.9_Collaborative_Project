@@ -29,7 +29,6 @@ inline double pbc(double x, const double boxby2) {
 }
 
 void force(mdsys_t *sys) {
-
   int i, j;
   double ffac, rx, ry, rz, epot;
 
@@ -47,15 +46,15 @@ void force(mdsys_t *sys) {
   natoms = sys->natoms / msize;
   natoms_res = sys->natoms % msize;
 
-  if(mid < natoms_res) natoms ++;
+  if (mid < natoms_res) natoms++;
 
   /* Indexes */
-  if(mid < natoms_res) {
+  if (mid < natoms_res) {
     start_index = mid * msize;
-    end_index = start_index + natoms; 
+    end_index = start_index + natoms;
   } else {
     start_index = (natoms_res * (natoms + 1)) + natoms * (mid - natoms_res);
-    end_index = start_index + natoms; 
+    end_index = start_index + natoms;
   }
   if (mid == (msize - 1)) end_index -= 1;
 
@@ -71,7 +70,7 @@ void force(mdsys_t *sys) {
 
   /* Broadcasting important data */
 #ifdef _MPI
-  if(msize != 1) {
+  if (msize != 1) {
     MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -138,21 +137,27 @@ void force(mdsys_t *sys) {
   }  // end parallel region
 #endif
 
-  /* 
+  /*
     The things that should be centralised are basically:
     - epot
     - fi
   */
 #ifdef _MPI
-  if(msize != 1) {
-    if(!mid){
-      MPI_Reduce(MPI_IN_PLACE, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-      MPI_Reduce(MPI_IN_PLACE, sys->fy, sys->natoms, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-      MPI_Reduce(MPI_IN_PLACE, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  if (msize != 1) {
+    if (!mid) {
+      MPI_Reduce(MPI_IN_PLACE, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
+                 MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, sys->fy, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
+                 MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
+                 MPI_COMM_WORLD);
     } else {
-      MPI_Reduce(sys->fx, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-      MPI_Reduce(sys->fy, sys->fy, sys->natoms, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-      MPI_Reduce(sys->fz, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+      MPI_Reduce(sys->fx, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
+                 MPI_COMM_WORLD);
+      MPI_Reduce(sys->fy, sys->fy, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
+                 MPI_COMM_WORLD);
+      MPI_Reduce(sys->fz, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
+                 MPI_COMM_WORLD);
     }
     MPI_Reduce(&epot, &(sys->epot), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
   } else {
