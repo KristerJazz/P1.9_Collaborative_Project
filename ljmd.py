@@ -40,7 +40,7 @@ class LJMD:
     def __init__(self, so_file):
         try:
             self._ljmd = CDLL(so_file)
-        except BaseException:
+        except:
             print("Please use the valid LJMD shared object file")
             raise
 
@@ -168,27 +168,39 @@ class LJMD:
         return data
 
     def restart(self, restfile):
-        with open(restfile) as f:
-            r = f.readlines()
-            assert(
-                len(r) == 2 * self.natoms),\
-				"Invalid restart file: File should have rows equal to twice the number of atoms\n"
+        try:
+        	with open(restfile) as f:
+        	    r = f.readlines()
+        	    assert(
+        	        len(r) == 2 * self.natoms),\
+					"Invalid restart file: File should have rows equal to twice the number of atoms\n"
 
-            for i in range(self.natoms):
-                self.sys.rx[i] = float(r[i].split()[0])
-                self.sys.ry[i] = float(r[i].split()[1])
-                self.sys.rz[i] = float(r[i].split()[2])
+        	    for i in range(self.natoms):
+        	        self.sys.rx[i] = float(r[i].split()[0])
+        	        self.sys.ry[i] = float(r[i].split()[1])
+        	        self.sys.rz[i] = float(r[i].split()[2])
 
-            for i in range(self.natoms):
-                self.sys.vx[i] = float(r[i + self.natoms].split()[0])
-                self.sys.vy[i] = float(r[i + self.natoms].split()[1])
-                self.sys.vz[i] = float(r[i + self.natoms].split()[2])
+        	    for i in range(self.natoms):
+        	        self.sys.vx[i] = float(r[i + self.natoms].split()[0])
+        	        self.sys.vy[i] = float(r[i + self.natoms].split()[1])
+        	        self.sys.vz[i] = float(r[i + self.natoms].split()[2])
+
+        except FileNotFoundError:
+            print("Please check if you have the correct path for the restart file")
+            raise
+        except:
+            raise
 
 
 if __name__ == '__main__':
-    input_path = sys.argv[1]
-    so_path = "lib/libljmd.so"
+    try:
+        input_path = sys.argv[1]
+    except:
+        raise
 	
+    so_path = "lib/libljmd.so"
+    so_path = "nothing.so"
+
     if "SHARED" in os.environ.keys():
         if os.environ["SHARED"] != "":
             so_path = os.environ["SHARED"] 
