@@ -3,7 +3,7 @@ language: c
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y mpi-default-bin mpi-default-dev
-  - sudo apt-get install python
+  - sudo apt-get install python3
   - pip install pytest --user
 
 
