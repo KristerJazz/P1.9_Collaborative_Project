@@ -6,7 +6,7 @@ Date: 17 February, 2020
 """
 from ctypes import *
 import sys
-
+import os
 
 class MDSYS_T(Structure):
     """
@@ -79,7 +79,12 @@ class LJMD:
         self.sys.fy = (c_double * self.natoms)()
         self.sys.fz = (c_double * self.natoms)()
 
-        self.restart("examples/" + self.restfile)
+        example_path = os.environ["EXAMPLES_PATH"] 
+        if example_path == "":
+           self.restart("examples/" + self.restfile)
+        else:
+           self.restart(example_path + "/" + self.restfile)
+           so_path = os.environ["SHARED"] 
 
         self.force()
         self.ekin()
@@ -179,7 +184,10 @@ class LJMD:
 
 if __name__ == '__main__':
     input_path = sys.argv[1]
-    so_path = "lib/libljmd.so"
+    if os.environ["SHARED"] == "":
+        so_path = "lib/libljmd.so"
+    else:
+        so_path = os.environ["SHARED"] 
 
     main = LJMD(so_path)
 
