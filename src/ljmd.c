@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <math.h>
+#include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,31 +19,54 @@
 int main(int argc, char **argv) {
   int nprint, i;
   char restfile[BLEN], trajfile[BLEN], ergfile[BLEN], line[BLEN];
+  
+  MPI_Init(&argc, &argv);
+  
   FILE *fp, *traj, *erg;
   mdsys_t sys;
 
+  int mid, msize;
+  MPI_Comm_rank(MPI_COMM_WORLD, &mid);
+  MPI_Comm_size(MPI_COMM_WORLD, &msize);
+
   /* read input file */
-  if (get_a_line(stdin, line)) return 1;
-  sys.natoms = atoi(line);
-  if (get_a_line(stdin, line)) return 1;
-  sys.mass = atof(line);
-  if (get_a_line(stdin, line)) return 1;
-  sys.epsilon = atof(line);
-  if (get_a_line(stdin, line)) return 1;
-  sys.sigma = atof(line);
-  if (get_a_line(stdin, line)) return 1;
-  sys.rcut = atof(line);
-  if (get_a_line(stdin, line)) return 1;
-  sys.box = atof(line);
-  if (get_a_line(stdin, restfile)) return 1;
-  if (get_a_line(stdin, trajfile)) return 1;
-  if (get_a_line(stdin, ergfile)) return 1;
-  if (get_a_line(stdin, line)) return 1;
-  sys.nsteps = atoi(line);
-  if (get_a_line(stdin, line)) return 1;
-  sys.dt = atof(line);
-  if (get_a_line(stdin, line)) return 1;
-  nprint = atoi(line);
+  if(!mid){
+    if (get_a_line(stdin, line)) return 1;
+    sys.natoms = atoi(line);
+    if (get_a_line(stdin, line)) return 1;
+    sys.mass = atof(line);
+    if (get_a_line(stdin, line)) return 1;
+    sys.epsilon = atof(line);
+    if (get_a_line(stdin, line)) return 1;
+    sys.sigma = atof(line);
+    if (get_a_line(stdin, line)) return 1;
+    sys.rcut = atof(line);
+    if (get_a_line(stdin, line)) return 1;
+    sys.box = atof(line);
+    if (get_a_line(stdin, restfile)) return 1;
+    if (get_a_line(stdin, trajfile)) return 1;
+    if (get_a_line(stdin, ergfile)) return 1;
+    if (get_a_line(stdin, line)) return 1;
+    sys.nsteps = atoi(line);
+    if (get_a_line(stdin, line)) return 1;
+    sys.dt = atof(line);
+    if (get_a_line(stdin, line)) return 1;
+    nprint = atoi(line);
+  }
+  if(msize != 1) {
+      MPI_Bcast(&(sys.natoms), 1, MPI_INT, 0, MPI_COMM_WORLD);
+      MPI_Bcast(&(sys.mass), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+      MPI_Bcast(&(sys.epsilon), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+      MPI_Bcast(&(sys.sigma), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+      MPI_Bcast(&(sys.rcut), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+      MPI_Bcast(&(sys.box), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+      MPI_Bcast(restfile, BLEN, MPI_CHAR, 0, MPI_COMM_WORLD);
+      MPI_Bcast(trajfile, BLEN, MPI_CHAR, 0, MPI_COMM_WORLD);
+      MPI_Bcast(ergfile, BLEN, MPI_CHAR, 0, MPI_COMM_WORLD);
+      MPI_Bcast(&(sys.nsteps), 1, MPI_INT, 0, MPI_COMM_WORLD);
+      MPI_Bcast(&(sys.dt), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+      MPI_Bcast(&nprint, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    }
 
   /* allocate memory */
   sys.rx = (double *)malloc(sys.natoms * sizeof(double));
@@ -81,6 +105,9 @@ int main(int argc, char **argv) {
   force(&sys);
   ekin(&sys);
 
+  
+
+  if(!mid){
   erg = fopen(ergfile, "w");
   traj = fopen(trajfile, "w");
 
@@ -90,23 +117,41 @@ int main(int argc, char **argv) {
       "     NFI            TEMP            EKIN                 EPOT           "
       "   ETOT\n");
   output(&sys, erg, traj);
-
+  }
   /**************************************************/
   /* main MD loop */
   for (sys.nfi = 1; sys.nfi <= sys.nsteps; ++sys.nfi) {
     /* write output, if requested */
+    if(!mid)
     if ((sys.nfi % nprint) == 0) output(&sys, erg, traj);
 
     /* propagate system and recompute energies */
-    velverlet(&sys);
+    int i;
+    if(!mid)
+    for (i = 0; i < sys.natoms; ++i) {
+      propagate_velocity(&sys, i);
+      propagate_position(&sys, i);
+    }
+
+    /* compute forces and potential energy */
+    force(&sys);
+
+    /* second part: propagate velocities by another half step */
+    if(!mid)
+    for (i = 0; i < sys.natoms; ++i) {
+      propagate_velocity(&sys, i);
+    }
+    if(!mid)
     ekin(&sys);
   }
   /**************************************************/
 
   /* clean up: close files, free memory */
+  if(!mid){
   printf("Simulation Done.\n");
   fclose(erg);
   fclose(traj);
+  }
 
   free(sys.rx);
   free(sys.ry);
@@ -117,6 +162,6 @@ int main(int argc, char **argv) {
   free(sys.fx);
   free(sys.fy);
   free(sys.fz);
-
+  MPI_Finalize();
   return 0;
 }
