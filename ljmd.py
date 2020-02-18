@@ -44,6 +44,12 @@ class LJMD:
             print("Please use the valid LJMD shared object file")
             raise
 
+    def mpi_init(self):
+        self._ljmd.mpi_init()
+
+    def mpi_finalise(self):
+        self._ljmd.mpi_finalise()
+
     def initialize_system(self, input_file):
         data = self.read_input(input_file)
 
@@ -223,10 +229,7 @@ if __name__ == '__main__':
             mpi_path = os.environ["ROOT_DIR"] + "/" + mpi_path
 
     main = LJMD(so_path)
-
-    mpi_helpers = CDLL(mpi_path)
+    main.mpi_init()
     main.initialize_system(input_path)
-    
-    mpi_helpers.init()
     main.run_simulation()
-    mpi_helpers.finalise()
+    main.mpi_finalise()
