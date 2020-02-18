@@ -14,5 +14,8 @@ clean:
 check: all
 	$(MAKE) $(MFLAGS) -C examples check
 
+perf: all
+	$(MAKE) $(MFLAGS) -C examples perf
+
 units-check:
 	$(MAKE) check -C tests

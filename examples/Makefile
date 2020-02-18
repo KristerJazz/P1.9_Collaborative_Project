@@ -4,12 +4,29 @@ include ../Rules.mk
 LD_LIBRARY_PATH=$(LIB_PATH)
 export LD_LIBRARY_PATH
 
+PERF_SAMPLE=argon_108.inp
+PYTHON_EXE=$(ROOT_DIR)/ljmd.py
+
 default: check
 
 clean:
-	rm -f *.xyz *.dat
+	rm -f *.xyz *.dat $(PERF_PATH)/*.data $(PERF_RESULT) $(PERF_PATH)/perfstat.txt
 
-check: $(EXE)
+check: check_exe check_python
+
+check_python: $(PYTHON_EXE) $(wildcard ../tests/python_tests/*.py)
+	python3 $(PYTHON_EXE) argon_108.inp
+	head -10 argon_108.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> a.dat
+	head -10 ../reference/argon_108.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> b.dat
+	cmp a.dat b.dat || exit 1
+	rm -f a.dat b.dat
+	python3 $(PYTHON_EXE) argon_2916.inp
+	head -10 argon_2916.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> a.dat
+	head -10 ../reference/argon_2916.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> b.dat
+	cmp a.dat b.dat || exit 1
+	rm -f a.dat b.dat
+
+check_exe: $(EXE)
 	$(EXE) < argon_108.inp
 	head -10 argon_108.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> a.dat
 	head -10 ../reference/argon_108.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> b.dat
@@ -20,3 +37,11 @@ check: $(EXE)
 	cmp a.dat b.dat || exit 1
 	rm -f a.dat b.dat
 
+perf: $(EXE) $(PERF_RESULT)
+
+$(PERF): $(EXE)
+	perf record -o $(PERF) -T -B $(EXE) < $(PERF_SAMPLE)
+	perf stat -o $(PERF_PATH)/perfstat.txt $(EXE) < $(PERF_SAMPLE) 
+
+$(PERF_RESULT): $(PERF)
+	perf report -i $(PERF)
