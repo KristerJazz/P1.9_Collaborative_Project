@@ -3,13 +3,12 @@ language: c
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y mpi-default-bin mpi-default-dev
-  - sudo apt-get install python3.7
+  - sudo apt-get install python
+  - pip install pytest --user
+
 
 compiler:
   - gcc
-
-install:
-  - pip3 install pytest --user
 
 script:
   - make units-check
