@@ -119,10 +119,9 @@ class LJMD:
         self.sys.nfi = 1
 
         while self.sys.nfi <= self.sys.nsteps:
-            if (self.sys.nfi % self.nprint) == 0 and master:
-                self.write_output()
-
             if master:
+                if (self.sys.nfi % self.nprint) == 0:
+                    self.write_output()
                 self.propagate1()
 
             self.force()
@@ -130,6 +129,7 @@ class LJMD:
             if master:
                 self.propagate2()
                 self._ljmd.ekin(byref(self.sys))
+                
             self.sys.nfi += 1
 
         # Close the files
