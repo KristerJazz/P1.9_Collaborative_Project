@@ -6,6 +6,7 @@
   Dependencies:
   - MPI > 3.0
 */
+#include <mpi.h>
 
 void mpi_init()
 {
