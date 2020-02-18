@@ -6,6 +6,8 @@
   Dependencies:
   - MPI > 3.0
 */
+
+#ifdef _MPI
 #include <mpi.h>
 
 void mpi_init()
@@ -17,3 +19,4 @@ void mpi_finalise()
 {
   MPI_Finalize();
 }
+#endif /* _MPI */
