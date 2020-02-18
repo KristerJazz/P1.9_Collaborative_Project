@@ -39,7 +39,8 @@ void force(mdsys_t *sys) {
   double rcsq = POW2(sys->rcut);
  
 
-#pragma omp parallel reduction (+:epot) {
+#pragma omp parallel reduction (+:epot)
+  {
   double ffac,rx,ry,rz;
   int i,j;
 #pragma omp for schedule(static)
