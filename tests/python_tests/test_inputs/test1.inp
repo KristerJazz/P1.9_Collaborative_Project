@@ -1,0 +1,12 @@
+2                # natoms
+1.0              # mass in AMU
+0.5              # epsilon in kcal/mol
+12.0             # sigma in angstrom
+16.0             # rcut in angstrom
+32.0             # box length (in angstrom)
+force_test1.rest # restart
+sample.xyz       # trajectory
+sample.dat       # energies
+1                # nr MD steps
+1.0              # MD time step (in fs)
+1                # output print frequency
