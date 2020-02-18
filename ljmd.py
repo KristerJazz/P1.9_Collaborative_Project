@@ -47,18 +47,22 @@ class LJMD:
     def initialize_system(self, input_file):
         data = self.read_input(input_file)
 
-        self.natoms = int(data[0])
-        self.mass = float(data[1])
-        self.epsilon = float(data[2])
-        self.sigma = float(data[3])
-        self.rcut = float(data[4])
-        self.box = float(data[5])
-        self.restfile = data[6]
-        self.trajfile = data[7]
-        self.ergfile = data[8]
-        self.nsteps = int(data[9])
-        self.dt = float(data[10])
-        self.nprint = int(data[11])
+        try:
+            self.natoms = int(data[0])
+            self.mass = float(data[1])
+            self.epsilon = float(data[2])
+            self.sigma = float(data[3])
+            self.rcut = float(data[4])
+            self.box = float(data[5])
+            self.restfile = data[6]
+            self.trajfile = data[7]
+            self.ergfile = data[8]
+            self.nsteps = int(data[9])
+            self.dt = float(data[10])
+            self.nprint = int(data[11])
+        except:
+            print("Please check values of your input file")
+            raise
 
         self.sys = MDSYS_T(natoms=self.natoms,
                            mass=self.mass,
@@ -128,7 +132,6 @@ class LJMD:
             self._ljmd.propagate_velocity(byref(self.sys), i)
 
     def ekin(self):
-        print("Kinetic energy initialized")
         self._ljmd.ekin(byref(self.sys))
 
     def write_output(self):
