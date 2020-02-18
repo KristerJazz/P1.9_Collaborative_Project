@@ -10,4 +10,6 @@ compiler:
 script:
   - make units-check
   - make check
+  - pip install pytest
+  - python -m pytest .
 
