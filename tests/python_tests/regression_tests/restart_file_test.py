@@ -13,7 +13,7 @@ class RestartTest(unittest.TestCase):
         self.assertRaises(FileNotFoundError, self.main.restart, restart_file)
 
     def test_wrong_input_data1(self):
-        restart_file = "examples/argon_108.inp" #wrong input file
+        restart_file = "tests/python_tests/test_inputs/test1.inp" #wrong input file
         self.assertRaises(AssertionError, self.main.restart, restart_file)
 
     def test_correct_input(self):

@@ -11,15 +11,7 @@ class SystemInitTest(unittest.TestCase):
     def test_initialize_system_correct(self):
         correct_file = "tests/python_tests/test_inputs/test1.inp"
         self.main.initialize_system(correct_file)
-        """
-		correct_file = "examples/argon_108.inp"
-        correct_file = "examples/argon_108.inp"
-        correct_file = "examples/argon_108.inp"
-        correct_file = "examples/argon_108.inp"
-        correct_file = "examples/argon_108.inp"
-        correct_file = "examples/argon_108.inp"
-        correct_file = "examples/argon_108.inp"
-		"""
+
     def test_wrong_input_values(self):
         wrong_data_in_file = "tests/python_tests/test_inputs/wrong_input.inp"
         self.assertRaises(ValueError, self.main.initialize_system, wrong_data_in_file)
