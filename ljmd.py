@@ -98,26 +98,39 @@ class LJMD:
         self.sys.nfi = 0
 
     def run_simulation(self):
-        print("Running simulation")
+        master = True
+        if "OMPI_COMM_WORLD_RANK" in os.environ.keys():
+            if int(os.environ["OMPI_COMM_WORLD_RANK"]) != 0:
+                master = False
 
-        self.erg = open(self.ergfile, 'w')
-        self.traj = open(self.trajfile, 'w')
-        self.write_output()
+        # Open Writes initial
+        if master:
+            print("Running simulation")
+            self.erg = open(self.ergfile, 'w')
+            self.traj = open(self.trajfile, 'w')
+            self.write_output()
+
         self.sys.nfi = 1
+
         while self.sys.nfi <= self.sys.nsteps:
-            if (self.sys.nfi % self.nprint) == 0:
+            if (self.sys.nfi % self.nprint) == 0 and master:
                 self.write_output()
 
-            self.propagate1()
+            if master:
+                self.propagate1()
+
             self.force()
-            self.propagate2()
-            self._ljmd.ekin(byref(self.sys))
+
+            if master:
+                self.propagate2()
+                self._ljmd.ekin(byref(self.sys))
             self.sys.nfi += 1
 
-        print("Done simulation")
-
-        self.erg.close()
-        self.traj.close()
+        # Close the files
+        if master:
+            print("Done simulation")
+            self.erg.close()
+            self.traj.close()
 
     def propagate1(self):
         for i in range(self.natoms):
@@ -202,13 +215,18 @@ if __name__ == '__main__':
         raise
 	
     so_path = "lib/libljmd.so"
-    so_path = "nothing.so"
-
-    if "SHARED" in os.environ.keys():
-        if os.environ["SHARED"] != "":
-            so_path = os.environ["SHARED"] 
+    mpi_path = "lib/libmpi.so"
+	
+    if "ROOT_DIR" in os.environ.keys():
+        if os.environ["ROOT_DIR"] != "":
+            so_path = os.environ["ROOT_DIR"] + "/" + so_path  
+            mpi_path = os.environ["ROOT_DIR"] + "/" + mpi_path
 
     main = LJMD(so_path)
 
+    mpi_helpers = CDLL(mpi_path)
     main.initialize_system(input_path)
+    
+    mpi_helpers.init()
     main.run_simulation()
+    mpi_helpers.finalise()
