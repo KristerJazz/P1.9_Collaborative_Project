@@ -2,7 +2,7 @@
 include ../Rules.mk
 
 SHELL=/bin/sh
-CC=gcc
+CC=mpicc
 CFLAGS:=-Wall -g -O3 -ffast-math -fomit-frame-pointer -I$(HEADER_PATH)
 LDLIBS=-lm
 
