@@ -26,12 +26,10 @@ inline double pbc(double x, const double boxby2) {
 }
 
 void force(mdsys_t *sys) {
-  double ffac;
-  double rx, ry, rz;
-  int i, j;
-
+  
+  double epot;
   /* zero energy and forces */
-  sys->epot = 0.0;
+  epot = 0.0;
   azzero(sys->fx, sys->natoms);
   azzero(sys->fy, sys->natoms);
   azzero(sys->fz, sys->natoms);
@@ -39,9 +37,15 @@ void force(mdsys_t *sys) {
   double c12 = 4.0 * sys->epsilon * POW12(sys->sigma);
   double c6 = 4.0 * sys->epsilon * POW6(sys->sigma);
   double rcsq = POW2(sys->rcut);
+ 
 
+#pragma omp parallel reduction (+:epot) {
+  double ffac,rx,ry,rz;
+  int i,j;
+#pragma omp for schedule(static)
   for (i = 0; i < (sys->natoms) - 1; ++i) {
     for (j = i + 1; j < (sys->natoms); ++j) {
+
 
       /* get distance between particle i and j */
       rx = pbc(sys->rx[i] - sys->rx[j], 0.5 * sys->box);
@@ -54,12 +58,27 @@ void force(mdsys_t *sys) {
         double rinv2 = 1.0 / rsq;
         double rinv6 = POW3(rinv2);
         ffac = (12.0 * c12 * rinv6 - 6.0 * c6) * rinv6 * rinv2;
-        sys->epot += rinv6 * (c12 * rinv6 - c6); 
+        epot += rinv6 * (c12 * rinv6 - c6); 
 
-        sys->fx[i] += rx * ffac; sys->fx[j] -= rx * ffac;
-        sys->fy[i] += ry * ffac; sys->fy[j] -= ry * ffac;
-        sys->fz[i] += rz * ffac; sys->fz[j] -= rz * ffac;
+
+	rx *=ffac;
+	ry *=ffac;
+	rz *=ffac;
+	#pragma omp atomic
+        sys->fx[i] += rx;
+	#pragma omp atomic
+	sys->fy[i] += ry;
+	#pragma	omp atomic
+        sys->fz[i] += rz;
+	#pragma	omp atomic
+	sys->fx[j] -= rx;
+	#pragma	omp atomic
+	sys->fy[j] -= ry;
+	#pragma	omp atomic
+	sys->fz[j] -= rz;
+          }
+        }
       }
-    }
-  }
+     // end parallel region
+   sys->epot= epot;
 }
