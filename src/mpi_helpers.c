@@ -19,4 +19,9 @@ void mpi_finalise()
 {
   MPI_Finalize();
 }
+#else
+
+void mpi_init(){}
+void mpi_finalise(){}
+
 #endif /* _MPI */
