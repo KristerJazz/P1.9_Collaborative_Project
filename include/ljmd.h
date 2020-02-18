@@ -23,7 +23,11 @@
  */
 struct _mdsys {
   int natoms, nfi, nsteps;
+#ifndef WITH_MORSE
   double dt, mass, epsilon, sigma, box, rcut;
+#else
+  double dt, mass, box, rcut, De, a, re;
+#endif
   double ekin, epot, temp;
   double *rx, *ry, *rz;
   double *vx, *vy, *vz;

@@ -64,8 +64,11 @@ void force(mdsys_t *sys) {
   azzero(sys->fy, sys->natoms);
   azzero(sys->fz, sys->natoms);
 
+#ifndef WITH_MORSE
   double c12 = 4.0 * sys->epsilon * POW12(sys->sigma);
   double c6 = 4.0 * sys->epsilon * POW6(sys->sigma);
+#endif
+
   double rcsq = POW2(sys->rcut);
 
   /* Broadcasting important data */
@@ -94,14 +97,23 @@ void force(mdsys_t *sys) {
 
         /* compute force and energy if within cutoff */
         if (rsq < rcsq) {
+#ifndef WITH_MORSE
           double rinv2 = 1.0 / rsq;
           double rinv6 = POW3(rinv2);
+          
           ffac = (12.0 * c12 * rinv6 - 6.0 * c6) * rinv6 * rinv2;
           epot += rinv6 * (c12 * rinv6 - c6);
+#else
+          double r = sqrt(rsq);
+          double exp_f = exp(-1.0 * sys->a * (r - sys->re));
 
-          rx *= ffac;
-          ry *= ffac;
-          rz *= ffac;
+          ffac = -2.0 * sys->De * sys->a * exp_f * (1 - exp_f) / r;
+          epot += sys->De * POW2(1 - exp_f) - sys->De;
+#endif
+
+          rx *= ffac; 
+          ry *= ffac; 
+          rz *= ffac; 
 
           fx_i += rx;
           fy_i += ry;

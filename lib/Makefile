@@ -2,7 +2,7 @@
 include ../Rules.mk
 
 SHELL=/bin/sh
-CFLAGS:=-Wall -g -O3 -ffast-math -fomit-frame-pointer -I$(HEADER_PATH)
+CFLAGS:=-Wall -g -Ofast -fomit-frame-pointer -I$(HEADER_PATH)
 LDLIBS=-lm
 
 # list of source files
