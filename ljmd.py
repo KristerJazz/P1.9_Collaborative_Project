@@ -79,12 +79,15 @@ class LJMD:
         self.sys.fy = (c_double * self.natoms)()
         self.sys.fz = (c_double * self.natoms)()
 
-        example_path = os.environ["EXAMPLES_PATH"] 
+        example_path = ""
+
+        if "EXAMPLES_PATH" in os.environ.keys():
+           example_path = os.environ["EXAMPLES_PATH"] + "/" + self.restfile 
+
         if example_path == "":
-           self.restart("examples/" + self.restfile)
-        else:
-           self.restart(example_path + "/" + self.restfile)
-           so_path = os.environ["SHARED"] 
+           example_path = "examples/" + self.restfile
+        
+        self.restart(example_path)
 
         self.force()
         self.ekin()
@@ -184,10 +187,11 @@ class LJMD:
 
 if __name__ == '__main__':
     input_path = sys.argv[1]
-    if os.environ["SHARED"] == "":
-        so_path = "lib/libljmd.so"
-    else:
-        so_path = os.environ["SHARED"] 
+    so_path = "lib/libljmd.so"
+	
+    if "SHARED" in os.environ.keys():
+        if os.environ["SHARED"] != "":
+            so_path = os.environ["SHARED"] 
 
     main = LJMD(so_path)
 
