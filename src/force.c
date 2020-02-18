@@ -80,7 +80,7 @@ void force(mdsys_t *sys) {
           }
         }
       }
-  sys->epot= epot;  
+    
   } // end parallel region
-   
+  sys->epot= epot; 
 }
