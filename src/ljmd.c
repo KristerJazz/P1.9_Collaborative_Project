@@ -8,7 +8,9 @@
 #include <assert.h>
 #include <ctype.h>
 #include <math.h>
+#ifdef _MPI
 #include <mpi.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,17 +22,22 @@ int main(int argc, char **argv) {
   int nprint, i;
   char restfile[BLEN], trajfile[BLEN], ergfile[BLEN], line[BLEN];
   
+#ifdef _MPI
   MPI_Init(&argc, &argv);
-  
-  FILE *fp, *traj, *erg;
-  mdsys_t sys;
-
   int mid, msize;
   MPI_Comm_rank(MPI_COMM_WORLD, &mid);
   MPI_Comm_size(MPI_COMM_WORLD, &msize);
+#else 
+  const int mid = 0;
+#endif /* _MPI */
+
+  FILE *fp, *traj, *erg;
+  mdsys_t sys;
 
   /* read input file */
+#ifdef _MPI
   if(!mid){
+#endif /* _MPI */
     if (get_a_line(stdin, line)) return 1;
     sys.natoms = atoi(line);
     if (get_a_line(stdin, line)) return 1;
@@ -52,6 +59,7 @@ int main(int argc, char **argv) {
     sys.dt = atof(line);
     if (get_a_line(stdin, line)) return 1;
     nprint = atoi(line);
+#ifdef _MPI
   }
   if(msize != 1) {
       MPI_Bcast(&(sys.natoms), 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -67,7 +75,7 @@ int main(int argc, char **argv) {
       MPI_Bcast(&(sys.dt), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
       MPI_Bcast(&nprint, 1, MPI_INT, 0, MPI_COMM_WORLD);
     }
-
+#endif /* _MPI */
   /* allocate memory */
   sys.rx = (double *)malloc(sys.natoms * sizeof(double));
   sys.ry = (double *)malloc(sys.natoms * sizeof(double));
@@ -105,8 +113,6 @@ int main(int argc, char **argv) {
   force(&sys);
   ekin(&sys);
 
-  
-
   if(!mid){
   erg = fopen(ergfile, "w");
   traj = fopen(trajfile, "w");
@@ -122,27 +128,27 @@ int main(int argc, char **argv) {
   /* main MD loop */
   for (sys.nfi = 1; sys.nfi <= sys.nsteps; ++sys.nfi) {
     /* write output, if requested */
-    if(!mid)
-    if ((sys.nfi % nprint) == 0) output(&sys, erg, traj);
-
-    /* propagate system and recompute energies */
-    int i;
-    if(!mid)
-    for (i = 0; i < sys.natoms; ++i) {
-      propagate_velocity(&sys, i);
-      propagate_position(&sys, i);
+    if(!mid) {
+      int i;
+      /* write output, if requested */
+      if ((sys.nfi % nprint) == 0) output(&sys, erg, traj);
+       /* propagate system and recompute energies */
+      for (i = 0; i < sys.natoms; ++i) {
+        propagate_velocity(&sys, i);
+        propagate_position(&sys, i);
+      }
     }
 
     /* compute forces and potential energy */
     force(&sys);
 
-    /* second part: propagate velocities by another half step */
-    if(!mid)
-    for (i = 0; i < sys.natoms; ++i) {
-      propagate_velocity(&sys, i);
+    if(!mid) {
+      /* second part: propagate velocities by another half step */
+      for (i = 0; i < sys.natoms; ++i) {
+        propagate_velocity(&sys, i);
+      }
+      ekin(&sys);
     }
-    if(!mid)
-    ekin(&sys);
   }
   /**************************************************/
 
@@ -162,6 +168,8 @@ int main(int argc, char **argv) {
   free(sys.fx);
   free(sys.fy);
   free(sys.fz);
+#ifdef _MPI
   MPI_Finalize();
+#endif /* _MPI */
   return 0;
 }
