@@ -12,9 +12,9 @@ class IOtest(unittest.TestCase):
 		self.assertRaises(FileNotFoundError, self.main.read_input, input_file)
 	
 	def test_wrong_input_data1(self):
-		input_file = "examples/argon_108.rest" #wrong input file
+		input_file = "tests/python_tests/test_inputs/force_test1.rest" #wrong input file
 		self.assertRaises(AssertionError, self.main.read_input, input_file)
 	
 	def test_correct_input(self):
-		input_file = "examples/argon_108.inp"
+		input_file = "tests/python_tests/test_inputs/test.inp"
 		self.main.read_input(input_file)
