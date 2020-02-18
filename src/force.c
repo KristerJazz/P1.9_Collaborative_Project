@@ -10,7 +10,9 @@
 */
 
 #include <math.h>
+#ifdef _MPI
 #include <mpi.h>
+#endif /* _MPI */
 
 #include "ljmd.h"
 
@@ -32,10 +34,15 @@ void force(mdsys_t *sys) {
   double ffac, rx, ry, rz, epot;
 
   /* Get the rank */
-  int mid, msize, natoms, natoms_res, start_index, end_index;
+  int natoms, natoms_res, start_index, end_index;
+#ifdef _MPI
+  /* Get the rank */
+  int mid, msize;
   MPI_Comm_rank(MPI_COMM_WORLD, &mid);
   MPI_Comm_size(MPI_COMM_WORLD, &msize);
-
+#else
+  const int mid = 0, msize = 1;
+#endif /* _MPI */
   /* Number of atoms per process */
   natoms = sys->natoms / msize;
   natoms_res = sys->natoms % msize;
@@ -63,11 +70,13 @@ void force(mdsys_t *sys) {
   double rcsq = POW2(sys->rcut);
 
   /* Broadcasting important data */
+#ifdef _MPI
   if(msize != 1) {
     MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   }
+#endif /* _MPI */
 
 #if defined(_OPENMP)
 #pragma omp parallel reduction(+ : epot)
@@ -134,6 +143,7 @@ void force(mdsys_t *sys) {
     - epot
     - fi
   */
+#ifdef _MPI
   if(msize != 1) {
     if(!mid){
       MPI_Reduce(MPI_IN_PLACE, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
@@ -148,4 +158,7 @@ void force(mdsys_t *sys) {
   } else {
     sys->epot = epot;
   }
+#else
+  sys->epot = epot;
+#endif /* _MPI */
 }
