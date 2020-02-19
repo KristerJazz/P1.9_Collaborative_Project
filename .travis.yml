@@ -1,15 +1,16 @@
 language: c
+python:
+  - "3.6"
 
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y mpi-default-bin mpi-default-dev
-  - sudo apt-get install python3
 
 compiler:
   - gcc
 
 install:
-  - pip install pytest --user
+  - pip3 install pytest --user
 
 script:
   - make units-check
