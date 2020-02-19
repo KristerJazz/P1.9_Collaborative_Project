@@ -10,7 +10,7 @@ compiler:
   - gcc
 
 install:
-  - pip install pytest --user
+  - pip install pytest
 
 script:
   - make units-check
