@@ -50,6 +50,9 @@ and the reference directory the corresponding outputs.
 * With OpenMP but not MPI: `make WITH_OMP=$NUM_THREADS check`
 * With OpenMP and MPI: `make WITH_OMP=$NUM_THREADS WITH_MPI=$NUM_PROCS check`
 
+* pip install -r requirements.txt
+* python -m pytest .
+
 **Cleaning**
 
 `make clean`
