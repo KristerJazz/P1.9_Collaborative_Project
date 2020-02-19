@@ -40,11 +40,15 @@ class LjmdPropagateParticleUnitTest(unittest.TestCase):
         self.sys.vx[0] = 0
         self.sys.vy[0] = 0
         self.sys.vz[0] = 0
+        self.sys.fx[0] = 0
+        self.sys.fy[0] = 0
+        self.sys.fz[0] = 0
 
-    def test_2_particle_inside_threshold_1(self):
+
+    def test_particle_propagate1_x(self):
         self.sys.fx[0] = 2*self.mvesq
 
-        self.ljmd.propagate1(byref(self.sys))
+        self.ljmd.initial_propagation(byref(self.sys))
 
         self.assertAlmostEqual(1, self.sys.rx[0], 7)
         self.assertAlmostEqual(0, self.sys.ry[0], 7)
@@ -54,42 +58,28 @@ class LjmdPropagateParticleUnitTest(unittest.TestCase):
         self.assertAlmostEqual(0, self.sys.vy[0], 7)
         self.assertAlmostEqual(0, self.sys.vz[0], 7)
 
-    def test_2_particle_inside_threshold_2(self):
-        self.sys.ry[0] = 12
+    def test_particle_propagate1_y(self):
+        self.sys.fy[0] = 2*self.mvesq
 
-        self.ljmd.force(byref(self.sys))
-        self.assertAlmostEqual(0, self.sys.fx[0], 7)
-        self.assertAlmostEqual(1, self.sys.fy[0], 7)
-        self.assertAlmostEqual(0, self.sys.fz[0], 7)
+        self.ljmd.initial_propagation(byref(self.sys))
 
-    def test_2_particle_inside_threshold_3(self):
-        self.sys.rz[0] = 12
+        self.assertAlmostEqual(0, self.sys.rx[0], 7)
+        self.assertAlmostEqual(1, self.sys.ry[0], 7)
+        self.assertAlmostEqual(0, self.sys.rz[0], 7)
+		
+        self.assertAlmostEqual(0, self.sys.vx[0], 7)
+        self.assertAlmostEqual(1, self.sys.vy[0], 7)
+        self.assertAlmostEqual(0, self.sys.vz[0], 7)
 
-        self.ljmd.force(byref(self.sys))
-        self.assertAlmostEqual(0, self.sys.fx[0], 7)
-        self.assertAlmostEqual(0, self.sys.fy[0], 7)
-        self.assertAlmostEqual(1, self.sys.fz[0], 7)
+    def test_particle_propagate1_z(self):
+        self.sys.fz[0] = 2*self.mvesq
 
-    def test_2_particle_outside_threshold_1(self):
-        self.sys.rx[0] = 16
+        self.ljmd.initial_propagation(byref(self.sys))
 
-        self.ljmd.force(byref(self.sys))
-        self.assertAlmostEqual(0, self.sys.fx[0], 7)
-        self.assertAlmostEqual(0, self.sys.fy[0], 7)
-        self.assertAlmostEqual(0, self.sys.fz[0], 7)
-
-    def test_2_particle_outside_threshold_2(self):
-        self.sys.ry[0] = 16
-
-        self.ljmd.force(byref(self.sys))
-        self.assertAlmostEqual(0, self.sys.fx[0], 7)
-        self.assertAlmostEqual(0, self.sys.fy[0], 7)
-        self.assertAlmostEqual(0, self.sys.fz[0], 7)
-
-    def test_2_particle_outside_threshold_3(self):
-        self.sys.rz[0] = 16
-
-        self.ljmd.force(byref(self.sys))
-        self.assertAlmostEqual(0, self.sys.fx[0], 7)
-        self.assertAlmostEqual(0, self.sys.fy[0], 7)
-        self.assertAlmostEqual(0, self.sys.fz[0], 7)
+        self.assertAlmostEqual(0, self.sys.rx[0], 7)
+        self.assertAlmostEqual(0, self.sys.ry[0], 7)
+        self.assertAlmostEqual(1, self.sys.rz[0], 7)
+		
+        self.assertAlmostEqual(0, self.sys.vx[0], 7)
+        self.assertAlmostEqual(0, self.sys.vy[0], 7)
+        self.assertAlmostEqual(1, self.sys.vz[0], 7)
