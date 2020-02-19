@@ -63,11 +63,6 @@ void ekin(mdsys_t *sys);
 void force(mdsys_t *sys);
 
 /**
- * @brief velocity verlet
- */
-void velverlet(mdsys_t *sys);
-
-/**
  * @brief propagate positions
  */
 void propagate_position(mdsys_t *sys, int i);
