@@ -134,13 +134,7 @@ int main(int argc, char **argv) {
     }
 
     /* compute forces and potential energy */
-#ifdef _MPI
-    MPI_Barrier(MPI_COMM_WORLD);
-#endif
     force(&sys);
-#ifdef _MPI
-    MPI_Barrier(MPI_COMM_WORLD);
-#endif
 
     if (!mid) {
       final_propagation(&sys);
@@ -166,10 +160,7 @@ int main(int argc, char **argv) {
   free(sys.fy);
   free(sys.fz);
 #ifdef _MPI
-  printf("rank: %d\n", mid);
-  MPI_Barrier(MPI_COMM_WORLD);
   MPI_Finalize();
-  printf("Finalise.\n");
 #endif /* _MPI */
   return 0;
 }
