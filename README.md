@@ -54,9 +54,32 @@ and the reference directory the corresponding outputs.
 
 `make clean`
 
-Type: make
-to compile everything and: make clean
-to remove all compiled objects
+**Running**
+
+Without MPI:
+
+```bash
+OMP_NUM_THREADS=$NUM_THREADS
+LD_LIBRARY_PATH=lib
+
+# Python
+python3 ljmd.py $INPUT_FILE
+# C
+./ljmd.x < $INPUT_FILE
+```
+
+With MPI:
+
+```bash
+OMP_NUM_THREADS=$NUM_THREADS
+LD_LIBRARY_PATH=lib
+
+# Python
+mpirun -np $NUM_PROCS python3 ljmd.py $INPUT_FILE
+# C
+mpirun -np $NUM_PROCS ./ljmd.x < $INPUT_FILE
+```
+
 
 ### Requirements
 
