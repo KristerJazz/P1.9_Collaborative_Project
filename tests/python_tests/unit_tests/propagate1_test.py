@@ -2,7 +2,7 @@ import unittest
 from ctypes import *
 from ljmd import MDSYS_T
 
-class LjmdPropagateParticleUnitTest(unittest.TestCase):
+class LjmdPropagate_1_UnitTest(unittest.TestCase):
     def setUp(self):
         so_path = "lib/libljmd.so"
         self.ljmd = CDLL(so_path)
