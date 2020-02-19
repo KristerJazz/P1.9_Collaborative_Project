@@ -74,12 +74,12 @@ int main(int argc, char **argv) {
     MPI_Bcast(&(sys.natoms), 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&(sys.mass), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 #ifndef WITH_MORSE
+    MPI_Bcast(&(sys.epsilon), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&(sys.sigma), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+#else
     MPI_Bcast(&(sys.De), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&(sys.re), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&(sys.a), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-#else
-    MPI_Bcast(&(sys.epsilon), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&(sys.sigma), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 #endif
     MPI_Bcast(&(sys.rcut), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&(sys.box), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -91,36 +91,6 @@ int main(int argc, char **argv) {
     MPI_Bcast(&nprint, 1, MPI_INT, 0, MPI_COMM_WORLD);
   }
 #endif /* _MPI */
-  if (get_a_line(stdin, line)) return 1;
-  sys.natoms = atoi(line);
-  if (get_a_line(stdin, line)) return 1;
-  sys.mass = atof(line);
-  if (get_a_line(stdin, line)) return 1;
-#ifndef WITH_MORSE
-  sys.epsilon = atof(line);
-#else
-  sys.De = atof(line); 
-#endif
-  if (get_a_line(stdin, line)) return 1;
-#ifndef WITH_MORSE
-  sys.sigma = atof(line);
-#else
-  sys.re = pow(2.0, 1/6) * atof(line);
-  sys.a  = sqrt(30) / sys.re;
-#endif
-  if (get_a_line(stdin, line)) return 1;
-  sys.rcut = atof(line);
-  if (get_a_line(stdin, line)) return 1;
-  sys.box = atof(line);
-  if (get_a_line(stdin, restfile)) return 1;
-  if (get_a_line(stdin, trajfile)) return 1;
-  if (get_a_line(stdin, ergfile)) return 1;
-  if (get_a_line(stdin, line)) return 1;
-  sys.nsteps = atoi(line);
-  if (get_a_line(stdin, line)) return 1;
-  sys.dt = atof(line);
-  if (get_a_line(stdin, line)) return 1;
-  nprint = atoi(line);
 
   /* allocate memory */
   sys.rx = (double *)malloc(sys.natoms * sizeof(double));
