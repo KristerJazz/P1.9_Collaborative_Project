@@ -5,7 +5,7 @@ python:
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y libomp-dev
-  - pushd scripts
+  - pushd script
   - sudo ./get_mpich.sh
   - popd
 
