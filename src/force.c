@@ -164,6 +164,7 @@ void force(mdsys_t *sys) {
                  MPI_COMM_WORLD);
       MPI_Reduce(MPI_IN_PLACE, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
                  MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, &epot, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     } else {
       MPI_Reduce(sys->fx, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
                  MPI_COMM_WORLD);
@@ -171,8 +172,9 @@ void force(mdsys_t *sys) {
                  MPI_COMM_WORLD);
       MPI_Reduce(sys->fz, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
                  MPI_COMM_WORLD);
+      MPI_Reduce( &epot, &epot, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     }
-    MPI_Reduce(&epot, &(sys->epot), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    sys->epot = epot;
     MPI_Barrier(MPI_COMM_WORLD);
   } else {
     sys->epot = epot;
