@@ -130,24 +130,17 @@ int main(int argc, char **argv) {
   for (sys.nfi = 1; sys.nfi <= sys.nsteps; ++sys.nfi) {
     /* write output, if requested */
     if (!mid) {
-      int i;
       /* write output, if requested */
       if ((sys.nfi % nprint) == 0) output(&sys, erg, traj);
       /* propagate system and recompute energies */
-      for (i = 0; i < sys.natoms; ++i) {
-        propagate_velocity(&sys, i);
-        propagate_position(&sys, i);
-      }
+      initial_propagation(&sys);
     }
 
     /* compute forces and potential energy */
     force(&sys);
 
     if (!mid) {
-      /* second part: propagate velocities by another half step */
-      for (i = 0; i < sys.natoms; ++i) {
-        propagate_velocity(&sys, i);
-      }
+      final_propagation(&sys);
       ekin(&sys);
     }
   }
