@@ -134,7 +134,13 @@ int main(int argc, char **argv) {
     }
 
     /* compute forces and potential energy */
+#ifdef _MPI
+    MPI_Barrier();
+#endif
     force(&sys);
+#ifdef _MPI
+    MPI_Barrier();
+#endif
 
     if (!mid) {
       final_propagation(&sys);

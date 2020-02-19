@@ -144,7 +144,6 @@ void force(mdsys_t *sys) {
   */
 #ifdef _MPI
   if (msize != 1) {
-    MPI_Barrier(MPI_COMM_WORLD);
     if (!mid) {
       MPI_Reduce(MPI_IN_PLACE, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
                  MPI_COMM_WORLD);
@@ -161,7 +160,6 @@ void force(mdsys_t *sys) {
                  MPI_COMM_WORLD);
     }
     MPI_Reduce(&epot, &(sys->epot), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Barrier(MPI_COMM_WORLD);
   } else {
     sys->epot = epot;
   }
