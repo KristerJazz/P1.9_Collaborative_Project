@@ -125,3 +125,29 @@ With the `TravisCI` we run both the C tests and the pytests for different versio
 I also implemented regression test that involves the `LJMD` python `class` that served as a wrapper for the C code having the same test cases. 
 
 The tests are added to the `TRAVIS-CI` for `CI/CD` purposes.
+
+
+## Optimizations
+
+Assigned: Stefano Campanella
+Github name: stefanocampanella
+
+A number of simple optimizations have been implemented: the inlining of the `pbc` function, safe and unsafe compiler optimizations (through compiler flags `-O3` and `-ffast-math`, which can be combined into `-Ofast`) and architecture specific optimization/instructions through `-march=native` (`-mtune=native` is redundant). Afterwards, an algorithmic optimization taking advantage of the Newtorn's third law was implemented (performance gains are reported in the perf directory). It has been put particular attention in avoiding useless expensive operations and caching the results whenever possible.
+
+## MPI parallelization
+
+Assigned: Luis Leon
+Github name: lleon95
+
+The parallel MPI version of the program has been implemented. This parallel version leverage a replicated data approach and has been implemented in C using OpenMPI (basically, at each iteration the position of the particles is broadcasted and the value of the forces/potential energy is reduced). The code has been integrated with the rest of the project (Python wrapper, Morse potential, etc.). In particular, the Python integration has been provided by means of some utility functions (ex. the MPI initialize/finalize functions) and the environment variable provided by the MPI standard.
+
+## OpenMP parallelization
+
+Assigned: Mattia Carello
+Github name: mattiacmhpc
+
+The most computational demanding function of the code is `force(mdsys_t *sys)`, as can be checked with`perf` most of the work is executed inside this function. The force function has been parallelized using OpenMP (the code can be compiled with `-Wall -Wextra` without warnings, the OpenMP sections of code has been guarded with preprocessor directives). Race conditions have been avoided through private variables (`i,j,ffac,rx,ry,rz`). Some implementation choices were the usage of the dynamic scheduler and atomic updates (instead of critical sections/mutexes).
+
+## Bonus task: Morse Potential
+
+The Morse potential has been added to the simulation and tested (it can be enabled at compile time, with the `-DWITH_MORSE` flag). The format of the input files is the same, the `epsilon` and `sigma` parameters are converted to the ones used by the Morse potential during the reading of the input. This conversion is made by requiring that the position, depth and width of the minimum of the potential well is the same in both cases. 
