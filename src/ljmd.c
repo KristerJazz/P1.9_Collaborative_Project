@@ -34,6 +34,8 @@ int main(int argc, char **argv) {
   FILE *fp, *traj, *erg;
   mdsys_t sys;
 
+  traj = NULL; erg = NULL;
+
   /* read input file */
 #ifdef _MPI
   if (!mid) {
