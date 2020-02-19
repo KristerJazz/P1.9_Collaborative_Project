@@ -2,8 +2,17 @@
 include ../Rules.mk
 
 SHELL=/bin/sh
-CFLAGS:=-Wall -g -Ofast -fomit-frame-pointer -I$(HEADER_PATH)
+CC=gcc
+CFLAGS:=-Wall -g -Ofast -march=native -fomit-frame-pointer -I$(HEADER_PATH)
 LDLIBS=-lm
+
+ifeq ("$(origin WITH_OMP)", "command line")
+CFLAGS+=-fopenmp
+endif
+
+ifeq ("$(origin WITH_MORSE)", "command line")
+CFLAGS+=-DWITH_MORSE
+endif
 
 # list of source files
 SRC=$(wildcard $(SRC_PATH)/*.c)
