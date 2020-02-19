@@ -34,9 +34,11 @@ void initial_propagation(mdsys_t *sys) {
   }
 }
 
-void final_propagation(mdsys_t *sys) {
+int final_propagation(mdsys_t *sys) {
+  if(!sys) return -1;
   int i;
   for (i = 0; i < sys->natoms; ++i) {
     propagate_velocity(sys, i);
   }
+  return 0;
 }
