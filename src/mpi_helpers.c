@@ -9,6 +9,7 @@
 
 #ifdef _MPI
 #include <mpi.h>
+#include <stdlib.h>
 
 void mpi_init() { MPI_Init(NULL, NULL); }
 
