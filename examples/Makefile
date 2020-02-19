@@ -12,7 +12,7 @@ default: check
 clean:
 	rm -f *.xyz *.dat $(PERF_PATH)/*.data $(PERF_RESULT) $(PERF_PATH)/perfstat.txt
 
-check: check_exe check_python check_morse
+check: check_python
 
 check_python: $(PYTHON_EXE) $(wildcard ../tests/python_tests/*.py)
 	$(MAKE) -C $(LIB_PATH) clean
