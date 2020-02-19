@@ -11,12 +11,14 @@
 #include <mpi.h>
 #include <stdlib.h>
 
-void mpi_init() { MPI_Init(NULL, NULL); }
+#include "ljmd.h"
 
-void mpi_finalise() { MPI_Finalize(); }
+void ljmd_mpi_init() { MPI_Init(NULL, NULL); }
+
+void ljmd_mpi_finalise() { MPI_Finalize(); }
 #else
 
-void mpi_init() {}
-void mpi_finalise() {}
+void ljmd_mpi_init() {}
+void ljmd_mpi_finalise() {}
 
 #endif /* _MPI */

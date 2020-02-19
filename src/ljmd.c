@@ -135,11 +135,11 @@ int main(int argc, char **argv) {
 
     /* compute forces and potential energy */
 #ifdef _MPI
-    MPI_Barrier();
+    MPI_Barrier(MPI_COMM_WORLD);
 #endif
     force(&sys);
 #ifdef _MPI
-    MPI_Barrier();
+    MPI_Barrier(MPI_COMM_WORLD);
 #endif
 
     if (!mid) {
