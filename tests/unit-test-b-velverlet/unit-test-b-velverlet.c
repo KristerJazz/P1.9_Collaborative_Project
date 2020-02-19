@@ -41,11 +41,8 @@ int main(int argc, char **argv) {
   }
 
   /* test */
-  for (i = 0; i < NATOMS; ++i) {
-    propagate_velocity(&sys, i);
-    propagate_position(&sys, i);
-    propagate_velocity(&sys, i);
-  }
+  initial_propagation(&sys);
+  final_propagation(&sys);
 
   /* verification */
   for (i = 0; i < NATOMS; ++i) {

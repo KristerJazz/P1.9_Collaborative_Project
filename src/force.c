@@ -10,6 +10,9 @@
 */
 
 #include <math.h>
+#ifdef _MPI
+#include <mpi.h>
+#endif /* _MPI */
 
 #include "ljmd.h"
 
@@ -28,6 +31,33 @@ inline double pbc(double x, const double boxby2) {
 void force(mdsys_t *sys) {
   int i, j;
   double ffac, rx, ry, rz, epot;
+
+  /* Get the rank */
+  int natoms, natoms_res, start_index, end_index;
+#ifdef _MPI
+  /* Get the rank */
+  int mid, msize;
+  MPI_Comm_rank(MPI_COMM_WORLD, &mid);
+  MPI_Comm_size(MPI_COMM_WORLD, &msize);
+#else
+  const int mid = 0, msize = 1;
+#endif /* _MPI */
+  /* Number of atoms per process */
+  natoms = sys->natoms / msize;
+  natoms_res = sys->natoms % msize;
+
+  if (mid < natoms_res) natoms++;
+
+  /* Indexes */
+  if (mid < natoms_res) {
+    start_index = mid * msize;
+    end_index = start_index + natoms;
+  } else {
+    start_index = (natoms_res * (natoms + 1)) + natoms * (mid - natoms_res);
+    end_index = start_index + natoms;
+  }
+  if (mid == (msize - 1)) end_index -= 1;
+
   /* zero energy and forces */
   epot = 0.0;
   azzero(sys->fx, sys->natoms);
@@ -38,12 +68,21 @@ void force(mdsys_t *sys) {
   double c6 = 4.0 * sys->epsilon * POW6(sys->sigma);
   double rcsq = POW2(sys->rcut);
 
+  /* Broadcasting important data */
+#ifdef _MPI
+  if (msize != 1) {
+    MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  }
+#endif /* _MPI */
+
 #if defined(_OPENMP)
 #pragma omp parallel reduction(+ : epot)
   {
 #pragma omp for schedule(dynamic) private(i, j, ffac, rx, ry, rz)
 #endif
-    for (i = 0; i < (sys->natoms) - 1; ++i) {
+    for (i = start_index; i < end_index; ++i) {
       double fx_i, fy_i, fz_i;
       fx_i = fy_i = fz_i = 0.0;
       for (j = i + 1; j < (sys->natoms); ++j) {
@@ -97,5 +136,34 @@ void force(mdsys_t *sys) {
 #if defined(_OPENMP)
   }  // end parallel region
 #endif
+
+  /*
+    The things that should be centralised are basically:
+    - epot
+    - fi
+  */
+#ifdef _MPI
+  if (msize != 1) {
+    if (!mid) {
+      MPI_Reduce(MPI_IN_PLACE, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
+                 MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, sys->fy, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
+                 MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
+                 MPI_COMM_WORLD);
+    } else {
+      MPI_Reduce(sys->fx, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
+                 MPI_COMM_WORLD);
+      MPI_Reduce(sys->fy, sys->fy, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
+                 MPI_COMM_WORLD);
+      MPI_Reduce(sys->fz, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
+                 MPI_COMM_WORLD);
+    }
+    MPI_Reduce(&epot, &(sys->epot), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  } else {
+    sys->epot = epot;
+  }
+#else
   sys->epot = epot;
+#endif /* _MPI */
 }

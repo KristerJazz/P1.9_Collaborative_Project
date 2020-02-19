@@ -40,25 +40,35 @@ class LJMD:
     def __init__(self, so_file):
         try:
             self._ljmd = CDLL(so_file)
-        except BaseException:
+        except:
             print("Please use the valid LJMD shared object file")
             raise
+
+    def mpi_init(self):
+        self._ljmd.mpi_init()
+
+    def mpi_finalise(self):
+        self._ljmd.mpi_finalise()
 
     def initialize_system(self, input_file):
         data = self.read_input(input_file)
 
-        self.natoms = int(data[0])
-        self.mass = float(data[1])
-        self.epsilon = float(data[2])
-        self.sigma = float(data[3])
-        self.rcut = float(data[4])
-        self.box = float(data[5])
-        self.restfile = data[6]
-        self.trajfile = data[7]
-        self.ergfile = data[8]
-        self.nsteps = int(data[9])
-        self.dt = float(data[10])
-        self.nprint = int(data[11])
+        try:
+            self.natoms = int(data[0])
+            self.mass = float(data[1])
+            self.epsilon = float(data[2])
+            self.sigma = float(data[3])
+            self.rcut = float(data[4])
+            self.box = float(data[5])
+            self.restfile = data[6]
+            self.trajfile = data[7]
+            self.ergfile = data[8]
+            self.nsteps = int(data[9])
+            self.dt = float(data[10])
+            self.nprint = int(data[11])
+        except:
+            print("Please check values of your input file")
+            raise
 
         self.sys = MDSYS_T(natoms=self.natoms,
                            mass=self.mass,
@@ -94,41 +104,50 @@ class LJMD:
         self.sys.nfi = 0
 
     def run_simulation(self):
-        print("Running simulation")
+        master = True
+        if "OMPI_COMM_WORLD_RANK" in os.environ.keys():
+            if int(os.environ["OMPI_COMM_WORLD_RANK"]) != 0:
+                master = False
 
-        self.erg = open(self.ergfile, 'w')
-        self.traj = open(self.trajfile, 'w')
-        self.write_output()
+        # Open Writes initial
+        if master:
+            print("Running simulation")
+            self.erg = open(self.ergfile, 'w')
+            self.traj = open(self.trajfile, 'w')
+            self.write_output()
+
         self.sys.nfi = 1
-        while self.sys.nfi <= self.sys.nsteps:
-            if (self.sys.nfi % self.nprint) == 0:
-                self.write_output()
 
-            self.propagate1()
+        while self.sys.nfi <= self.sys.nsteps:
+            if master:
+                if (self.sys.nfi % self.nprint) == 0:
+                    self.write_output()
+                self.propagate1()
+
             self.force()
-            self.propagate2()
-            self._ljmd.ekin(byref(self.sys))
+
+            if master:
+                self.propagate2()
+                self._ljmd.ekin(byref(self.sys))
+                
             self.sys.nfi += 1
 
-        print("Done simulation")
-
-        self.erg.close()
-        self.traj.close()
+        # Close the files
+        if master:
+            print("Done simulation")
+            self.erg.close()
+            self.traj.close()
 
     def propagate1(self):
-        for i in range(self.natoms):
-            self._ljmd.propagate_velocity(byref(self.sys), i)
-            self._ljmd.propagate_position(byref(self.sys), i)
+        self._ljmd.initial_propagation(byref(self.sys))
 
     def force(self):
         self._ljmd.force(byref(self.sys))
 
     def propagate2(self):
-        for i in range(self.natoms):
-            self._ljmd.propagate_velocity(byref(self.sys), i)
+        self._ljmd.final_propagation(byref(self.sys))
 
     def ekin(self):
-        print("Kinetic energy initialized")
         self._ljmd.ekin(byref(self.sys))
 
     def write_output(self):
@@ -168,32 +187,46 @@ class LJMD:
         return data
 
     def restart(self, restfile):
-        with open(restfile) as f:
-            r = f.readlines()
-            assert(
-                len(r) == 2 * self.natoms),\
-				"Invalid restart file: File should have rows equal to twice the number of atoms\n"
+        try:
+        	with open(restfile) as f:
+        	    r = f.readlines()
+        	    assert(
+        	        len(r) == 2 * self.natoms),\
+					"Invalid restart file: File should have rows equal to twice the number of atoms\n"
 
-            for i in range(self.natoms):
-                self.sys.rx[i] = float(r[i].split()[0])
-                self.sys.ry[i] = float(r[i].split()[1])
-                self.sys.rz[i] = float(r[i].split()[2])
+        	    for i in range(self.natoms):
+        	        self.sys.rx[i] = float(r[i].split()[0])
+        	        self.sys.ry[i] = float(r[i].split()[1])
+        	        self.sys.rz[i] = float(r[i].split()[2])
 
-            for i in range(self.natoms):
-                self.sys.vx[i] = float(r[i + self.natoms].split()[0])
-                self.sys.vy[i] = float(r[i + self.natoms].split()[1])
-                self.sys.vz[i] = float(r[i + self.natoms].split()[2])
+        	    for i in range(self.natoms):
+        	        self.sys.vx[i] = float(r[i + self.natoms].split()[0])
+        	        self.sys.vy[i] = float(r[i + self.natoms].split()[1])
+        	        self.sys.vz[i] = float(r[i + self.natoms].split()[2])
+
+        except FileNotFoundError:
+            print("Please check if you have the correct path for the restart file")
+            raise
+        except:
+            raise
 
 
 if __name__ == '__main__':
-    input_path = sys.argv[1]
-    so_path = "lib/libljmd.so"
+    try:
+        input_path = sys.argv[1]
+    except:
+        raise
 	
-    if "SHARED" in os.environ.keys():
-        if os.environ["SHARED"] != "":
-            so_path = os.environ["SHARED"] 
+    so_path = "lib/libljmd.so"
+    mpi_path = "lib/libmpi.so"
+	
+    if "ROOT_DIR" in os.environ.keys():
+        if os.environ["ROOT_DIR"] != "":
+            so_path = os.environ["ROOT_DIR"] + "/" + so_path  
+            mpi_path = os.environ["ROOT_DIR"] + "/" + mpi_path
 
     main = LJMD(so_path)
-
+    main.mpi_init()
     main.initialize_system(input_path)
     main.run_simulation()
+    main.mpi_finalise()
