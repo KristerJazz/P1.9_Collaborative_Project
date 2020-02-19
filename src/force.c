@@ -12,7 +12,7 @@
 #include <math.h>
 #ifdef _MPI
 #include <mpi.h>
-#endif /* _MPI */
+#endif
 
 #include "ljmd.h"
 
@@ -155,6 +155,7 @@ void force(mdsys_t *sys) {
     - fi
   */
 #ifdef _MPI
+  MPI_Barrier(MPI_COMM_WORLD);
   if (msize != 1) {
     if (!mid) {
       MPI_Reduce(MPI_IN_PLACE, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
@@ -172,6 +173,7 @@ void force(mdsys_t *sys) {
                  MPI_COMM_WORLD);
     }
     MPI_Reduce(&epot, &(sys->epot), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
   } else {
     sys->epot = epot;
   }
