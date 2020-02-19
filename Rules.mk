@@ -21,10 +21,8 @@ SHARED_FILE=lib$(PROJECT_NAME).so
 SHARED=$(LIB_PATH)/$(SHARED_FILE)
 
 ifeq ("$(origin WITH_MPI)", "command line")
-EXECUTER=time mpirun -np
+EXECUTER=mpirun -np
 NUM_PROC=$(WITH_MPI)
-else
-EXECUTER=time
 endif
 ifeq ("$(origin WITH_OMP)", "command line")
 OMP_NUM_THREADS:=$(WITH_OMP)

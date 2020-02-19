@@ -17,7 +17,6 @@ install:
 
 script:
   - make units-check
-  - make check
-  - make
+  - make -B check
   - make -B WITH_MPI=2 WITH_OMP=1 check
   - make -B WITH_MPI=1 WITH_OMP=2 check

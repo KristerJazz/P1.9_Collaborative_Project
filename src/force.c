@@ -155,8 +155,8 @@ void force(mdsys_t *sys) {
     - fi
   */
 #ifdef _MPI
-  MPI_Barrier(MPI_COMM_WORLD);
   if (msize != 1) {
+    MPI_Barrier(MPI_COMM_WORLD);
     if (!mid) {
       MPI_Reduce(MPI_IN_PLACE, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
                  MPI_COMM_WORLD);
