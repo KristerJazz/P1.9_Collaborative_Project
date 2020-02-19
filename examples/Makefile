@@ -12,7 +12,7 @@ default: check
 clean:
 	rm -f *.xyz *.dat $(PERF_PATH)/*.data $(PERF_RESULT) $(PERF_PATH)/perfstat.txt
 
-check: check_python
+check: check_python check_exe
 
 check_python: $(PYTHON_EXE) $(wildcard ../tests/python_tests/*.py)
 	$(EXECUTER) $(NUM_PROC) python3 $(PYTHON_EXE) argon_108.inp
