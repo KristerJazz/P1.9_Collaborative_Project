@@ -15,4 +15,7 @@ install:
 script:
   - make units-check
   - make check
+  - make
+  - python3 -m pytest .
+  - make -B WITH_OMP=1
   - python3 -m pytest .
