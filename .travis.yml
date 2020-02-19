@@ -17,3 +17,5 @@ script:
   - make check
   - python3 -m pytest .
 
+after_sucess:
+  - codecov
