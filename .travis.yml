@@ -4,7 +4,10 @@ python:
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y mpi-default-bin mpi-default-dev
+  - sudo apt-get install -y libomp-dev
+  - pushd scripts
+  - sudo ./get_mpich.sh
+  - popd
 
 compiler:
   - gcc
@@ -15,4 +18,8 @@ install:
 script:
   - make units-check
   - make check
+  - make check WITH_MPI=2
+  - make check WITH_OMP=2
+  - make check WITH_OMP=1 WITH_MPI=2
+  - make check WITH_OMP=2 WITH_MPI=1
   - python3 -m pytest .
