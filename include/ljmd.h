@@ -63,14 +63,14 @@ void ekin(mdsys_t *sys);
 void force(mdsys_t *sys);
 
 /**
- * @brief propagate positions
+ * @brief first propagation
  */
-void propagate_position(mdsys_t *sys, int i);
+void initial_propagation(mdsys_t *sys);
 
 /**
- * @brief propagate velocities
+ * @brief last propagation
  */
-void propagate_velocity(mdsys_t *sys, int i);
+void final_propagation(mdsys_t *sys);
 
 /**
  * @brief append data to output.
