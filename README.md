@@ -23,7 +23,7 @@ and the reference directory the corresponding outputs.
 * **Stefano Campanella**: stefanocampanella
 * **Luis Leon**: lleon95
 * **Mattia Carello**: mattiacmhpc
-* **Jazz Krister**: KristerJazz
+* **Jazz Urog**: KristerJazz
 
 ## Policies
 
@@ -90,3 +90,38 @@ mpirun -np $NUM_PROCS ./ljmd.x < $INPUT_FILE
 * GCC > 8
 * pytest Python Module
 * make
+
+## Python wrapper and unittest
+Assigned: Krister Jazz Urog
+Github name - KristerJazz
+
+We implemented a python wrapper that uses the share object compiled by a previously compiled and optimized code for `Lennard Jones potential MD code`.
+You can refer to the above instructions on how to compile and use a specific version of the optimized code.
+Options are available:
+
+1. Serial
+2. OMP-enabled
+3. MPI-enabled
+4. Hybrid MPI-OMP
+
+Unit tests are done to check the C code function with the python as a wrapper.
+Test cases are built for the cases that,
+
+1. 2 particle is within the cutoff region
+2. 2 particle is outside the cutoff region
+3. 1 particle where we set the force manually
+
+where each case is assigned to different values that are simply computable and verifiable.
+
+The test cases where applied to the following function, 
+
+1. Force function
+2. Initial propagate function
+3. Second propagate function.
+
+such that the functions outputs correct values of the `position`, `velocity`, `force` is checked, whichever value is needed to be checked.
+
+With the `TravisCI` we run both the C tests and the pytests for different versions of the code, `serial`, `omp` enabled, and `mpi-enabled`.
+I also implemented regression test that involves the `LJMD` python `class` that served as a wrapper for the C code having the same test cases. 
+
+The tests are added to the `TRAVIS-CI` for `CI/CD` purposes.
