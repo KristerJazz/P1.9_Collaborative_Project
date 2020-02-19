@@ -15,4 +15,5 @@ install:
 script:
   - make units-check
   - make check
+  - make
   - python3 -m pytest .
