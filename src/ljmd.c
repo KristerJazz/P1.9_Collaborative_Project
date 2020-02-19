@@ -166,6 +166,8 @@ int main(int argc, char **argv) {
   free(sys.fy);
   free(sys.fz);
 #ifdef _MPI
+  printf("rank: %d\n", mid);
+  MPI_Barrier(MPI_COMM_WORLD);
   MPI_Finalize();
   printf("Finalise.\n");
 #endif /* _MPI */
