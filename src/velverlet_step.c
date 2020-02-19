@@ -26,12 +26,14 @@ inline int propagate_velocity(mdsys_t *sys, int i) {
   return 0;
 }
 
-void initial_propagation(mdsys_t *sys) {
+int initial_propagation(mdsys_t *sys) {
+  if(!sys) return -1;
   int i;
   for (i = 0; i < sys->natoms; ++i) {
     propagate_velocity(sys, i);
     propagate_position(sys, i);
   }
+  return 0;
 }
 
 int final_propagation(mdsys_t *sys) {
