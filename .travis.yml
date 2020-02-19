@@ -17,3 +17,7 @@ script:
   - make check
   - make
   - python3 -m pytest .
+  - make -B WITH_OMP
+  - python3 -m pytest .
+  - make -B WITH_MPI
+  - python3 -m pytest .
