@@ -32,6 +32,7 @@ int main(int argc, char **argv) {
 #endif /* _MPI */
 
   FILE *fp, *traj, *erg;
+  traj = NULL; erg = NULL;
   mdsys_t sys;
 
   /* read input file */
@@ -119,10 +120,6 @@ int main(int argc, char **argv) {
 
     printf("Starting simulation with %d atoms for %d steps.\n", sys.natoms,
            sys.nsteps);
-    printf(
-        "     NFI            TEMP            EKIN                 EPOT         "
-        "  "
-        "   ETOT\n");
     output(&sys, erg, traj);
   }
   /**************************************************/
