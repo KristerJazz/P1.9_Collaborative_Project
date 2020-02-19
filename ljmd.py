@@ -139,16 +139,13 @@ class LJMD:
             self.traj.close()
 
     def propagate1(self):
-        for i in range(self.natoms):
-            self._ljmd.propagate_velocity(byref(self.sys), i)
-            self._ljmd.propagate_position(byref(self.sys), i)
+        self._ljmd.initial_propagation(byref(self.sys))
 
     def force(self):
         self._ljmd.force(byref(self.sys))
 
     def propagate2(self):
-        for i in range(self.natoms):
-            self._ljmd.propagate_velocity(byref(self.sys), i)
+        self._ljmd.final_propagation(byref(self.sys))
 
     def ekin(self):
         self._ljmd.ekin(byref(self.sys))
