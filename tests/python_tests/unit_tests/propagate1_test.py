@@ -44,8 +44,7 @@ class LjmdPropagate_1_UnitTest(unittest.TestCase):
         self.sys.fy[0] = 0
         self.sys.fz[0] = 0
 
-
-    def test_particle_propagate1_x(self):
+    def test_particle_propagate1_positive_force_x(self):
         self.sys.fx[0] = 2*self.mvesq
 
         self.ljmd.initial_propagation(byref(self.sys))
@@ -58,7 +57,7 @@ class LjmdPropagate_1_UnitTest(unittest.TestCase):
         self.assertAlmostEqual(0, self.sys.vy[0], 7)
         self.assertAlmostEqual(0, self.sys.vz[0], 7)
 
-    def test_particle_propagate1_y(self):
+    def test_particle_propagate1_positive_force_y(self):
         self.sys.fy[0] = 2*self.mvesq
 
         self.ljmd.initial_propagation(byref(self.sys))
@@ -71,7 +70,7 @@ class LjmdPropagate_1_UnitTest(unittest.TestCase):
         self.assertAlmostEqual(1, self.sys.vy[0], 7)
         self.assertAlmostEqual(0, self.sys.vz[0], 7)
 
-    def test_particle_propagate1_z(self):
+    def test_particle_propagate1_positive_force_z(self):
         self.sys.fz[0] = 2*self.mvesq
 
         self.ljmd.initial_propagation(byref(self.sys))
@@ -83,3 +82,42 @@ class LjmdPropagate_1_UnitTest(unittest.TestCase):
         self.assertAlmostEqual(0, self.sys.vx[0], 7)
         self.assertAlmostEqual(0, self.sys.vy[0], 7)
         self.assertAlmostEqual(1, self.sys.vz[0], 7)
+
+    def test_particle_propagate1_negative_force_x(self):
+        self.sys.fx[0] = -2*self.mvesq
+
+        self.ljmd.initial_propagation(byref(self.sys))
+
+        self.assertAlmostEqual(-1, self.sys.rx[0], 7)
+        self.assertAlmostEqual(0, self.sys.ry[0], 7)
+        self.assertAlmostEqual(0, self.sys.rz[0], 7)
+		
+        self.assertAlmostEqual(-1, self.sys.vx[0], 7)
+        self.assertAlmostEqual(0, self.sys.vy[0], 7)
+        self.assertAlmostEqual(0, self.sys.vz[0], 7)
+
+    def test_particle_propagate1_negative_force_y(self):
+        self.sys.fy[0] = -2*self.mvesq
+
+        self.ljmd.initial_propagation(byref(self.sys))
+
+        self.assertAlmostEqual(0, self.sys.rx[0], 7)
+        self.assertAlmostEqual(-1, self.sys.ry[0], 7)
+        self.assertAlmostEqual(0, self.sys.rz[0], 7)
+		
+        self.assertAlmostEqual(0, self.sys.vx[0], 7)
+        self.assertAlmostEqual(-1, self.sys.vy[0], 7)
+        self.assertAlmostEqual(0, self.sys.vz[0], 7)
+
+    def test_particle_propagate1_negative_force_z(self):
+        self.sys.fz[0] = -2*self.mvesq
+
+        self.ljmd.initial_propagation(byref(self.sys))
+
+        self.assertAlmostEqual(0, self.sys.rx[0], 7)
+        self.assertAlmostEqual(0, self.sys.ry[0], 7)
+        self.assertAlmostEqual(-1, self.sys.rz[0], 7)
+		
+        self.assertAlmostEqual(0, self.sys.vx[0], 7)
+        self.assertAlmostEqual(0, self.sys.vy[0], 7)
+        self.assertAlmostEqual(-1, self.sys.vz[0], 7)
