@@ -4,7 +4,6 @@ python:
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y mpi-default-bin mpi-default-dev
   - sudo apt-get install -y libomp-dev
 
 compiler:
@@ -14,6 +13,9 @@ install:
   - pip install -r requirements.txt
 
 script:
+  - pushd scripts
+  - sudo ./get_mpich.sh
+  - popd
   - make units-check
   - make check
   - make
