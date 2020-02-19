@@ -71,6 +71,7 @@ void force(mdsys_t *sys) {
   /* Broadcasting important data */
 #ifdef _MPI
   if (msize != 1) {
+    MPI_Barrier(MPI_COMM_WORLD);
     MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -144,6 +145,7 @@ void force(mdsys_t *sys) {
   */
 #ifdef _MPI
   if (msize != 1) {
+    MPI_Barrier(MPI_COMM_WORLD);
     if (!mid) {
       MPI_Reduce(MPI_IN_PLACE, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
                  MPI_COMM_WORLD);

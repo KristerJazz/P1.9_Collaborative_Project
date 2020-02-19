@@ -11,8 +11,6 @@
 #include <mpi.h>
 #include <stdlib.h>
 
-#include "ljmd.h"
-
 void ljmd_mpi_init() { MPI_Init(NULL, NULL); }
 
 void ljmd_mpi_finalise() { MPI_Finalize(); }
