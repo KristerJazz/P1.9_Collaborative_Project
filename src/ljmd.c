@@ -161,6 +161,7 @@ int main(int argc, char **argv) {
   free(sys.fz);
 #ifdef _MPI
   MPI_Finalize();
+  printf("Finalise.\n");
 #endif /* _MPI */
   return 0;
 }
