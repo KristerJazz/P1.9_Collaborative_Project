@@ -3,7 +3,7 @@ include ../Rules.mk
 
 SHELL=/bin/sh
 CC=gcc
-CFLAGS:=-Wall -g -Ofast -march=native -fomit-frame-pointer -I$(HEADER_PATH)
+CFLAGS:=-Wall -g -O3 -ffast-math -march=native -fomit-frame-pointer -I$(HEADER_PATH)
 LDLIBS=-lm
 
 ifeq ("$(origin WITH_OMP)", "command line")
