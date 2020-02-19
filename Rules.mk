@@ -1,12 +1,14 @@
 PROJECT_NAME=ljmd
 
 ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+
 # Paths
 LIB_PATH=$(ROOT_DIR)/lib
 SRC_PATH=$(ROOT_DIR)/src
 HEADER_PATH=$(ROOT_DIR)/include
 EXE_PATH=$(ROOT_DIR)
 PERF_PATH=$(ROOT_DIR)/perf
+REFERENCE_PATH=$(ROOT_DIR)/reference
 EXAMPLES_PATH=$(ROOT_DIR)/examples
 
 # File names
