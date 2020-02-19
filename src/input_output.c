@@ -15,7 +15,8 @@ Dependencies:
 
 int get_a_line(FILE *fp, char *buf) {
   char tmp[BLEN], *ptr;
-
+  if(!fp) return -1;
+  if(!buf) return -1;
   /* read a line and cut of comments and blanks */
   if (fgets(tmp, BLEN, fp)) {
     int i;
@@ -42,9 +43,11 @@ int get_a_line(FILE *fp, char *buf) {
   return 0;
 }
 
-void output(mdsys_t *sys, FILE *erg, FILE *traj) {
+int output(mdsys_t *sys, FILE *erg, FILE *traj) {
   int i;
-
+  if(!sys) return -1;
+  if(!erg) return -1;
+  if(!traj) return -1;
   printf("% 8d % 20.8f % 20.8f % 20.8f % 20.8f\n", sys->nfi, sys->temp,
          sys->ekin, sys->epot, sys->ekin + sys->epot);
   fprintf(erg, "% 8d % 20.8f % 20.8f % 20.8f % 20.8f\n", sys->nfi, sys->temp,
@@ -55,4 +58,5 @@ void output(mdsys_t *sys, FILE *erg, FILE *traj) {
     fprintf(traj, "Ar  %20.8f %20.8f %20.8f\n", sys->rx[i], sys->ry[i],
             sys->rz[i]);
   }
+  return 0;
 }

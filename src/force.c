@@ -28,7 +28,8 @@ inline double pbc(double x, const double boxby2) {
   return x;
 }
 
-void force(mdsys_t *sys) {
+int force(mdsys_t *sys) {
+  if(!sys) return -1;
   int i, j;
   double ffac, rx, ry, rz, epot;
 
@@ -178,4 +179,5 @@ void force(mdsys_t *sys) {
 #else
   sys->epot = epot;
 #endif /* _MPI */
+  return 0;
 }

@@ -54,31 +54,31 @@ int get_a_line(FILE *fp, char *buf);
 /**
  * @brief helper function: zero out an array
  */
-void azzero(double *d, const int n);
+int azzero(double *d, const int n);
 
 /**
  * @brief compute kinetic energy
  */
-void ekin(mdsys_t *sys);
+int ekin(mdsys_t *sys);
 
 /**
  * @brief compute forces
  */
-void force(mdsys_t *sys);
+int force(mdsys_t *sys);
 
 /**
  * @brief first propagation
  */
-void initial_propagation(mdsys_t *sys);
+int initial_propagation(mdsys_t *sys);
 
 /**
  * @brief last propagation
  */
-void final_propagation(mdsys_t *sys);
+int final_propagation(mdsys_t *sys);
 
 /**
  * @brief append data to output.
  */
-void output(mdsys_t *sys, FILE *erg, FILE *traj);
+int output(mdsys_t *sys, FILE *erg, FILE *traj);
 
 #endif
