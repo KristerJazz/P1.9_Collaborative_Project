@@ -2,18 +2,23 @@
 include ../Rules.mk
 
 SHELL=/bin/sh
-CC=gcc
 CFLAGS:=-Wall -g -O3 -ffast-math -fomit-frame-pointer -I$(HEADER_PATH)
 LDLIBS=-lm
-
-ifeq ("$(origin WITH_OMP)", "command line")
-CFLAGS+=-fopenmp
-endif
 
 # list of source files
 SRC=$(wildcard $(SRC_PATH)/*.c)
 HEADERS=$(wildcard $(HEADER_PATH)/*.h)
 OBJ=$(SRC:$(SRC_PATH)/%.c=%.o)
+
+ifeq ("$(origin WITH_OMP)", "command line")
+CFLAGS+=-fopenmp
+endif
+ifeq ("$(origin WITH_MPI)", "command line")
+CC=mpicc
+CFLAGS+=-D_MPI
+else
+CC=gcc
+endif
 
 default: $(EXE) $(SHARED)
 

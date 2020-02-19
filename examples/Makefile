@@ -12,26 +12,26 @@ default: check
 clean:
 	rm -f *.xyz *.dat $(PERF_PATH)/*.data $(PERF_RESULT) $(PERF_PATH)/perfstat.txt
 
-check: check_exe check_python
+check: check_python check_exe
 
 check_python: $(PYTHON_EXE) $(wildcard ../tests/python_tests/*.py)
-	python3 $(PYTHON_EXE) argon_108.inp
+	$(EXECUTER) $(NUM_PROC) python3 $(PYTHON_EXE) argon_108.inp
 	head -10 argon_108.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> a.dat
 	head -10 ../reference/argon_108.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> b.dat
 	cmp a.dat b.dat || exit 1
 	rm -f a.dat b.dat
-	python3 $(PYTHON_EXE) argon_2916.inp
+	$(EXECUTER) $(NUM_PROC) python3 $(PYTHON_EXE) argon_2916.inp
 	head -10 argon_2916.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> a.dat
 	head -10 ../reference/argon_2916.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> b.dat
 	cmp a.dat b.dat || exit 1
 	rm -f a.dat b.dat
 
 check_exe: $(EXE)
-	$(EXE) < argon_108.inp
+	$(EXECUTER) $(NUM_PROC) $(EXE) < argon_108.inp
 	head -10 argon_108.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> a.dat
 	head -10 ../reference/argon_108.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> b.dat
 	cmp a.dat b.dat || exit 1
-	$(EXE) < argon_2916.inp
+	$(EXECUTER) $(NUM_PROC) $(EXE) < argon_2916.inp
 	head -10 argon_2916.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> a.dat
 	head -10 ../reference/argon_2916.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> b.dat
 	cmp a.dat b.dat || exit 1

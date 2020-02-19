@@ -18,5 +18,13 @@ PERF_RESULT=$(PERF_PATH)/stats.txt
 SHARED_FILE=lib$(PROJECT_NAME).so
 SHARED=$(LIB_PATH)/$(SHARED_FILE)
 
-export LIB_PATH SHARED EXAMPLES_PATH
+ifeq ("$(origin WITH_MPI)", "command line")
+EXECUTER=mpirun -np
+NUM_PROC=$(WITH_MPI)
+endif
+ifeq ("$(origin WITH_OMP)", "command line")
+OMP_NUM_THREADS:=$(WITH_OMP)
+endif
+
+export LIB_PATH SHARED EXAMPLES_PATH ROOT_DIR OMP_NUM_THREADS
 export ROOT_DIR

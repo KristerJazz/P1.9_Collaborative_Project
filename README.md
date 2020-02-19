@@ -1,5 +1,11 @@
 # P1.9_Collaborative_Project
 
+| Master | Develop |
+|--------|---------|
+| ![](https://travis-ci.com/KristerJazz/P1.9_Collaborative_Project.svg?branch=master) | ![](https://travis-ci.com/KristerJazz/P1.9_Collaborative_Project.svg?branch=develop) |
+
+Current revision: **v0.2**
+
 ## Description
 
 This package contains simplified MD code with multi-threading.
@@ -30,6 +36,54 @@ and the reference directory the corresponding outputs.
 
 ## Compilation instructions
 
-Type: make
-to compile everything and: make clean
-to remove all compiled objects
+**Compile**
+
+* Without MPI nor OpenMP: `make`
+* With MPI but not OpenMP: `make WITH_MPI=1`
+* With OpenMP but not MPI: `make WITH_OMP=1`
+* With OpenMP and MPI: `make WITH_OMP=1 WITH_MPI=1`
+  
+**Running checks**
+
+* Without MPI nor OpenMP: `make check`
+* With MPI but not OpenMP: `make WITH_MPI=$NUM_PROCS check`
+* With OpenMP but not MPI: `make WITH_OMP=$NUM_THREADS check`
+* With OpenMP and MPI: `make WITH_OMP=$NUM_THREADS WITH_MPI=$NUM_PROCS check`
+
+**Cleaning**
+
+`make clean`
+
+**Running**
+
+Without MPI:
+
+```bash
+OMP_NUM_THREADS=$NUM_THREADS
+LD_LIBRARY_PATH=lib
+
+# Python
+python3 ljmd.py $INPUT_FILE
+# C
+./ljmd.x < $INPUT_FILE
+```
+
+With MPI:
+
+```bash
+OMP_NUM_THREADS=$NUM_THREADS
+LD_LIBRARY_PATH=lib
+
+# Python
+mpirun -np $NUM_PROCS python3 ljmd.py $INPUT_FILE
+# C
+mpirun -np $NUM_PROCS ./ljmd.x < $INPUT_FILE
+```
+
+
+### Requirements
+
+* OpenMPI > 3
+* GCC > 8
+* pytest Python Module
+* make
