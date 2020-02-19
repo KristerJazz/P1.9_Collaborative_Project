@@ -50,6 +50,9 @@ and the reference directory the corresponding outputs.
 * With OpenMP but not MPI: `make WITH_OMP=$NUM_THREADS check`
 * With OpenMP and MPI: `make WITH_OMP=$NUM_THREADS WITH_MPI=$NUM_PROCS check`
 
+* pip install -r requirements.txt
+* python -m pytest .
+
 **Cleaning**
 
 `make clean`
@@ -71,8 +74,8 @@ python3 ljmd.py $INPUT_FILE
 With MPI:
 
 ```bash
-OMP_NUM_THREADS=$NUM_THREADS
-LD_LIBRARY_PATH=lib
+export OMP_NUM_THREADS=$NUM_THREADS
+export LD_LIBRARY_PATH=lib
 
 # Python
 mpirun -np $NUM_PROCS python3 ljmd.py $INPUT_FILE
