@@ -74,8 +74,8 @@ python3 ljmd.py $INPUT_FILE
 With MPI:
 
 ```bash
-OMP_NUM_THREADS=$NUM_THREADS
-LD_LIBRARY_PATH=lib
+export OMP_NUM_THREADS=$NUM_THREADS
+export LD_LIBRARY_PATH=lib
 
 # Python
 mpirun -np $NUM_PROCS python3 ljmd.py $INPUT_FILE
