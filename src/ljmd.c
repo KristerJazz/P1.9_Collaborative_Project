@@ -91,7 +91,6 @@ int main(int argc, char **argv) {
     MPI_Bcast(&nprint, 1, MPI_INT, 0, MPI_COMM_WORLD);
   }
 #endif /* _MPI */
-=======
   if (get_a_line(stdin, line)) return 1;
   sys.natoms = atoi(line);
   if (get_a_line(stdin, line)) return 1;
@@ -123,7 +122,6 @@ int main(int argc, char **argv) {
   if (get_a_line(stdin, line)) return 1;
   nprint = atoi(line);
 
->>>>>>> Add Morse potential
   /* allocate memory */
   sys.rx = (double *)malloc(sys.natoms * sizeof(double));
   sys.ry = (double *)malloc(sys.natoms * sizeof(double));

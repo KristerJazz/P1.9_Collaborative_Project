@@ -22,11 +22,7 @@ check_python: $(PYTHON_EXE) $(wildcard ../tests/python_tests/*.py)
 	head -10 $(REFERENCE_PATH)/argon_108.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> b.dat
 	cmp a.dat b.dat || exit 1
 	rm -f a.dat b.dat
-<<<<<<< HEAD
 	$(EXECUTER) $(NUM_PROC) python3 $(PYTHON_EXE) argon_2916.inp
-=======
-	python3 $(PYTHON_EXE) argon_2916.inp
->>>>>>> Fix makefiles
 	head -10 argon_2916.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> a.dat
 	head -10 $(REFERENCE_PATH)/argon_2916.dat | awk '{printf("%d %.6f %.6f %.6f\n",$$1,$$2,$$3,$$4);}'> b.dat
 	cmp a.dat b.dat || exit 1
