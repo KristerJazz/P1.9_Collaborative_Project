@@ -44,12 +44,6 @@ class LJMD:
             print("Please use the valid LJMD shared object file")
             raise
 
-    def ljmd_mpi_init(self):
-        self._ljmd.ljmd_mpi_init()
-
-    def ljmd_mpi_finalise(self):
-        self._ljmd.ljmd_mpi_finalise()
-
     def initialize_system(self, input_file):
         data = self.read_input(input_file)
 
@@ -104,39 +98,31 @@ class LJMD:
         self.sys.nfi = 0
 
     def run_simulation(self):
-        master = True
-        if "OMPI_COMM_WORLD_RANK" in os.environ.keys():
-            if int(os.environ["OMPI_COMM_WORLD_RANK"]) != 0:
-                master = False
 
         # Open Writes initial
-        if master:
-            print("Running simulation")
-            self.erg = open(self.ergfile, 'w')
-            self.traj = open(self.trajfile, 'w')
-            self.write_output()
+        print("Running simulation")
+        self.erg = open(self.ergfile, 'w')
+        self.traj = open(self.trajfile, 'w')
+        self.write_output()
 
         self.sys.nfi = 1
 
         while self.sys.nfi <= self.sys.nsteps:
-            if master:
-                if (self.sys.nfi % self.nprint) == 0:
-                    self.write_output()
-                self.propagate1()
+            if (self.sys.nfi % self.nprint) == 0:
+                self.write_output()
+            self.propagate1()
 
             self.force()
 
-            if master:
-                self.propagate2()
-                self._ljmd.ekin(byref(self.sys))
+            self.propagate2()
+            self._ljmd.ekin(byref(self.sys))
                 
             self.sys.nfi += 1
 
         # Close the files
-        if master:
-            print("Done simulation")
-            self.erg.close()
-            self.traj.close()
+        print("Done simulation")
+        self.erg.close()
+        self.traj.close()
 
     def propagate1(self):
         self._ljmd.initial_propagation(byref(self.sys))
@@ -211,20 +197,18 @@ class LJMD:
             raise
 
 
-if __name__ == '__main__':
-    try:
-        input_path = sys.argv[1]
-    except:
-        raise
-	
-    so_path = "lib/libljmd.so"
-	
-    if "ROOT_DIR" in os.environ.keys():
-        if os.environ["ROOT_DIR"] != "":
-            so_path = os.environ["ROOT_DIR"] + "/" + so_path  
+try:
+    input_path = sys.argv[1]
+except:
+    raise
 
-    main = LJMD(so_path)
-    main.ljmd_mpi_init()
-    main.initialize_system(input_path)
-    main.run_simulation()
-    main.ljmd_mpi_finalise()
+so_path = "lib/libljmd.so"
+
+if "ROOT_DIR" in os.environ.keys():
+    if os.environ["ROOT_DIR"] != "":
+        so_path = os.environ["ROOT_DIR"] + "/" + so_path
+
+
+main = LJMD(so_path)
+main.initialize_system(input_path)
+main.run_simulation()
