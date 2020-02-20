@@ -3,8 +3,8 @@ include ../Rules.mk
 
 SHELL=/bin/sh
 CC=gcc
-CFLAGS:=-Wall -g -Ofast -march=native -fomit-frame-pointer -I$(HEADER_PATH)
-LDLIBS=-lm
+CFLAGS:=-Wall -O3 -ffast-math -march=native -fomit-frame-pointer -I$(HEADER_PATH)
+LDLIBS=-lmvec -lm
 
 ifeq ("$(origin WITH_OMP)", "command line")
 CFLAGS+=-fopenmp
@@ -29,16 +29,16 @@ else
 CC=gcc
 endif
 
-default: $(EXE) $(SHARED)
+default: $(EXE) $(SHARED) $(HEADERS)
 
 clean:
 	rm -f *.mod *.o *.so ../*.x
 
 # linker rule
-$(EXE): $(SHARED) $(HEADERS)
-	$(CC) -o $@ $(CFLAGS) $(LDLIBS) -l$(PROJECT_NAME) -L$(LIB_PATH)
+$(EXE): $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS) $(LDLIBS)
 
-$(SHARED): $(OBJ)
+$(SHARED): $(filter-out ljmd.o, $(OBJ))
 	$(CC) -shared -o $@ $(CFLAGS) $^ $(LDLIBS)
 
 # compilation pattern rule for objects

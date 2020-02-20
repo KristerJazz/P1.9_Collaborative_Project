@@ -10,6 +10,10 @@
 #ifndef __LJMD__
 #define __LJMD__
 
+#ifdef _MPI
+#include <mpi.h>
+#endif
+
 #include <stdio.h>
 
 /**
@@ -32,6 +36,10 @@ struct _mdsys {
   double *rx, *ry, *rz;
   double *vx, *vy, *vz;
   double *fx, *fy, *fz;
+#if _MPI
+  int mid, msize;
+  MPI_Comm mcom;
+#endif
 };
 typedef struct _mdsys mdsys_t;
 

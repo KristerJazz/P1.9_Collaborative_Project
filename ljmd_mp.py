@@ -7,6 +7,12 @@ Date: 17 February, 2020
 from ctypes import *
 import sys
 import os
+from mpi4py import MPI
+
+if MPI._sizeof(MPI.Comm) == sizeof(c_int):
+    MPI_Comm = c_int
+else:
+    MPI_Comm = c_void_p
 
 class MDSYS_T(Structure):
     """
@@ -33,7 +39,8 @@ class MDSYS_T(Structure):
                 ('ekin', c_double), ('epot', c_double), ('temp', c_double),
                 ('rx', POINTER(c_double)), ('ry', POINTER(c_double)), ('rz', POINTER(c_double)),
                 ('vx', POINTER(c_double)), ('vy', POINTER(c_double)), ('vz', POINTER(c_double)),
-                ('fx', POINTER(c_double)), ('fy', POINTER(c_double)), ('fz', POINTER(c_double))]
+                ('fx', POINTER(c_double)), ('fy', POINTER(c_double)), ('fz', POINTER(c_double)),
+                ("mid", c_int), ("msize", c_int), ("mcom", MPI_Comm)]
 
 
 class LJMD:
@@ -45,7 +52,15 @@ class LJMD:
             raise
 
     def initialize_system(self, input_file):
-        data = self.read_input(input_file)
+        m_comm = MPI.COMM_WORLD
+        m_comm_ptr = MPI._addressof(m_comm)
+        m_comm_val = MPI_Comm.from_address(m_comm_ptr)
+        rank = int(m_comm.Get_rank())
+        if rank == 0:
+            data = self.read_input(input_file)
+        else:
+            data = None
+        data = m_comm.bcast(data, root=0)
 
         try:
             self.natoms = int(data[0])
@@ -82,6 +97,9 @@ class LJMD:
         self.sys.fx = (c_double * self.natoms)()
         self.sys.fy = (c_double * self.natoms)()
         self.sys.fz = (c_double * self.natoms)()
+        self.sys.msize =int(m_comm.Get_size())
+        self.sys.mid = int(m_comm.Get_rank())
+        self.sys.mcom = m_comm_val
 
         example_path = ""
 
@@ -91,38 +109,47 @@ class LJMD:
         if example_path == "":
            example_path = "examples/" + self.restfile
         
-        self.restart(example_path)
+        if rank == 0:
+            self.restart(example_path)
 
-        self.force()
-        self.ekin()
+            self.force()
+            self.ekin()
         self.sys.nfi = 0
 
     def run_simulation(self):
+        master = True
+        if int(self.sys.mid) != 0:
+            master = False
 
         # Open Writes initial
-        print("Running simulation")
-        self.erg = open(self.ergfile, 'w')
-        self.traj = open(self.trajfile, 'w')
-        self.write_output()
+        if master:
+            print("Running simulation - Steps: ", self.sys.nsteps)
+            self.erg = open(self.ergfile, 'w')
+            self.traj = open(self.trajfile, 'w')
+            self.write_output()
 
         self.sys.nfi = 1
 
         while self.sys.nfi <= self.sys.nsteps:
-            if (self.sys.nfi % self.nprint) == 0:
-                self.write_output()
-            self.propagate1()
+            if master:
+                if (self.sys.nfi % self.nprint) == 0:
+                    self.write_output()
+                    if self.sys.nfi == self.sys.nsteps:
+                        break
+                self.propagate1()
 
             self.force()
 
-            self.propagate2()
-            self._ljmd.ekin(byref(self.sys))
-                
+            if master:
+                self.propagate2()
+                self._ljmd.ekin(byref(self.sys))
             self.sys.nfi += 1
 
         # Close the files
-        print("Done simulation")
-        self.erg.close()
-        self.traj.close()
+        if master:
+            print("Done simulation")
+            self.erg.close()
+            self.traj.close()
 
     def propagate1(self):
         self._ljmd.initial_propagation(byref(self.sys))
@@ -208,7 +235,7 @@ if __name__ == '__main__':
         if os.environ["ROOT_DIR"] != "":
             so_path = os.environ["ROOT_DIR"] + "/" + so_path
 
-
     main = LJMD(so_path)
     main.initialize_system(input_path)
     main.run_simulation()
+    exit(0)

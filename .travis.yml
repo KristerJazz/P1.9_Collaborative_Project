@@ -4,7 +4,8 @@ python:
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y mpi-default-bin mpi-default-dev
+  - sudo apt-get install -y libomp-dev
+  - sudo apt-get install -y openmpi-bin libopenmpi-dev 
 
 compiler:
   - gcc
@@ -12,10 +13,13 @@ compiler:
 install:
   - pip install -r requirements.txt
 
+env:
+  - OMPI_MCA_btl_vader_single_copy_mechanism=none
+
 script:
   - make units-check
-  - make check
-  - make
+  - make -B check
   - python3 -m pytest .
-  - make -B WITH_OMP=1
-  - python3 -m pytest .
+  - make -B WITH_MPI=2 WITH_OMP=1 check
+  - make -B WITH_MPI=1 WITH_OMP=2 check
+  - make -B WITH_MORSE=1 check_morse
