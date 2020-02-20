@@ -5,7 +5,6 @@ LD_LIBRARY_PATH=$(LIB_PATH)
 export LD_LIBRARY_PATH
 
 PERF_SAMPLE=argon_108.inp
-PYTHON_EXE=$(ROOT_DIR)/ljmd.py
 
 default: check
 

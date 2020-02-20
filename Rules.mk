@@ -21,7 +21,7 @@ SHARED_FILE=lib$(PROJECT_NAME).so
 SHARED=$(LIB_PATH)/$(SHARED_FILE)
 
 ifeq ("$(origin WITH_MPI)", "command line")
-EXECUTER=mpirun --mca btl ^openib -np
+EXECUTER=mpirun -np
 NUM_PROC=$(WITH_MPI)
 PYTHON_EXE=$(ROOT_DIR)/ljmd_mp.py
 else
