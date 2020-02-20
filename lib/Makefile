@@ -2,8 +2,17 @@
 include ../Rules.mk
 
 SHELL=/bin/sh
-CFLAGS:=-Wall -g -O3 -ffast-math -fomit-frame-pointer -I$(HEADER_PATH)
-LDLIBS=-lm
+CC=gcc
+CFLAGS:=-Wall -O3 -ffast-math -march=native -fomit-frame-pointer -I$(HEADER_PATH)
+LDLIBS=-lmvec -lm
+
+ifeq ("$(origin WITH_OMP)", "command line")
+CFLAGS+=-fopenmp
+endif
+
+ifeq ("$(origin WITH_MORSE)", "command line")
+CFLAGS+=-DWITH_MORSE
+endif
 
 # list of source files
 SRC=$(wildcard $(SRC_PATH)/*.c)
@@ -20,16 +29,16 @@ else
 CC=gcc
 endif
 
-default: $(EXE) $(SHARED)
+default: $(EXE) $(SHARED) $(HEADERS)
 
 clean:
 	rm -f *.mod *.o *.so ../*.x
 
 # linker rule
-$(EXE): $(SHARED) $(HEADERS)
-	$(CC) -o $@ $(CFLAGS) $(LDLIBS) -l$(PROJECT_NAME) -L$(LIB_PATH)
+$(EXE): $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS) $(LDLIBS)
 
-$(SHARED): $(OBJ)
+$(SHARED): $(filter-out ljmd.o, $(OBJ))
 	$(CC) -shared -o $@ $(CFLAGS) $^ $(LDLIBS)
 
 # compilation pattern rule for objects

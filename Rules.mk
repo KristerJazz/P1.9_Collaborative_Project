@@ -1,12 +1,14 @@
 PROJECT_NAME=ljmd
 
 ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+
 # Paths
 LIB_PATH=$(ROOT_DIR)/lib
 SRC_PATH=$(ROOT_DIR)/src
 HEADER_PATH=$(ROOT_DIR)/include
 EXE_PATH=$(ROOT_DIR)
 PERF_PATH=$(ROOT_DIR)/perf
+REFERENCE_PATH=$(ROOT_DIR)/reference
 EXAMPLES_PATH=$(ROOT_DIR)/examples
 
 # File names
@@ -21,6 +23,9 @@ SHARED=$(LIB_PATH)/$(SHARED_FILE)
 ifeq ("$(origin WITH_MPI)", "command line")
 EXECUTER=mpirun -np
 NUM_PROC=$(WITH_MPI)
+PYTHON_EXE=$(ROOT_DIR)/ljmd_mp.py
+else
+PYTHON_EXE=$(ROOT_DIR)/ljmd.py
 endif
 ifeq ("$(origin WITH_OMP)", "command line")
 OMP_NUM_THREADS:=$(WITH_OMP)

@@ -10,6 +10,10 @@
 #ifndef __LJMD__
 #define __LJMD__
 
+#ifdef _MPI
+#include <mpi.h>
+#endif
+
 #include <stdio.h>
 
 /**
@@ -23,11 +27,19 @@
  */
 struct _mdsys {
   int natoms, nfi, nsteps;
+#ifndef WITH_MORSE
   double dt, mass, epsilon, sigma, box, rcut;
+#else
+  double dt, mass, box, rcut, De, a, re;
+#endif
   double ekin, epot, temp;
   double *rx, *ry, *rz;
   double *vx, *vy, *vz;
   double *fx, *fy, *fz;
+#if _MPI
+  int mid, msize;
+  MPI_Comm mcom;
+#endif
 };
 typedef struct _mdsys mdsys_t;
 

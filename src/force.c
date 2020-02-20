@@ -12,9 +12,11 @@
 #include <math.h>
 #ifdef _MPI
 #include <mpi.h>
-#endif /* _MPI */
+#endif
 
 #include "ljmd.h"
+
+#include <stdio.h>
 
 #define POW2(x) ((x) * (x))
 #define POW3(x) (POW2(x) * (x))
@@ -37,8 +39,8 @@ void force(mdsys_t *sys) {
 #ifdef _MPI
   /* Get the rank */
   int mid, msize;
-  MPI_Comm_rank(MPI_COMM_WORLD, &mid);
-  MPI_Comm_size(MPI_COMM_WORLD, &msize);
+  mid = sys->mid;
+  msize = sys->msize;
 #else
   const int mid = 0, msize = 1;
 #endif /* _MPI */
@@ -50,7 +52,7 @@ void force(mdsys_t *sys) {
 
   /* Indexes */
   if (mid < natoms_res) {
-    start_index = mid * msize;
+    start_index = mid * natoms;
     end_index = start_index + natoms;
   } else {
     start_index = (natoms_res * (natoms + 1)) + natoms * (mid - natoms_res);
@@ -64,16 +66,19 @@ void force(mdsys_t *sys) {
   azzero(sys->fy, sys->natoms);
   azzero(sys->fz, sys->natoms);
 
+#ifndef WITH_MORSE
   double c12 = 4.0 * sys->epsilon * POW12(sys->sigma);
   double c6 = 4.0 * sys->epsilon * POW6(sys->sigma);
+#endif
+
   double rcsq = POW2(sys->rcut);
 
   /* Broadcasting important data */
 #ifdef _MPI
   if (msize != 1) {
-    MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, sys->mcom);
+    MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, sys->mcom);
+    MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, sys->mcom);
   }
 #endif /* _MPI */
 
@@ -94,14 +99,23 @@ void force(mdsys_t *sys) {
 
         /* compute force and energy if within cutoff */
         if (rsq < rcsq) {
+#ifndef WITH_MORSE
           double rinv2 = 1.0 / rsq;
           double rinv6 = POW3(rinv2);
+          
           ffac = (12.0 * c12 * rinv6 - 6.0 * c6) * rinv6 * rinv2;
           epot += rinv6 * (c12 * rinv6 - c6);
+#else
+          double r = sqrt(rsq);
+          double exp_f = exp(-1.0 * sys->a * (r - sys->re));
 
-          rx *= ffac;
-          ry *= ffac;
-          rz *= ffac;
+          ffac = -2.0 * sys->De * sys->a * exp_f * (1 - exp_f) / r;
+          epot += sys->De * POW2(1 - exp_f) - sys->De;
+#endif
+
+          rx *= ffac; 
+          ry *= ffac; 
+          rz *= ffac; 
 
           fx_i += rx;
           fy_i += ry;
@@ -146,20 +160,20 @@ void force(mdsys_t *sys) {
   if (msize != 1) {
     if (!mid) {
       MPI_Reduce(MPI_IN_PLACE, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
-                 MPI_COMM_WORLD);
+                 sys->mcom);
       MPI_Reduce(MPI_IN_PLACE, sys->fy, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
-                 MPI_COMM_WORLD);
+                 sys->mcom);
       MPI_Reduce(MPI_IN_PLACE, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
-                 MPI_COMM_WORLD);
+                 sys->mcom);
     } else {
       MPI_Reduce(sys->fx, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
-                 MPI_COMM_WORLD);
+                 sys->mcom);
       MPI_Reduce(sys->fy, sys->fy, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
-                 MPI_COMM_WORLD);
+                 sys->mcom);
       MPI_Reduce(sys->fz, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
-                 MPI_COMM_WORLD);
+                 sys->mcom);
     }
-    MPI_Reduce(&epot, &(sys->epot), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&epot, &(sys->epot), 1, MPI_DOUBLE, MPI_SUM, 0, sys->mcom);
   } else {
     sys->epot = epot;
   }

@@ -14,6 +14,9 @@ clean:
 check: all
 	$(MAKE) $(MFLAGS) -C examples check
 
+check_morse: all
+	$(MAKE) $(MFLAGS) -C examples check_morse
+
 perf: all
 	$(MAKE) $(MFLAGS) -C examples perf
 
