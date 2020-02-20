@@ -196,19 +196,19 @@ class LJMD:
         except:
             raise
 
+if __name__ == '__main__':
+    try:
+        input_path = sys.argv[1]
+    except:
+        raise
 
-try:
-    input_path = sys.argv[1]
-except:
-    raise
+    so_path = "lib/libljmd.so"
 
-so_path = "lib/libljmd.so"
-
-if "ROOT_DIR" in os.environ.keys():
-    if os.environ["ROOT_DIR"] != "":
-        so_path = os.environ["ROOT_DIR"] + "/" + so_path
+    if "ROOT_DIR" in os.environ.keys():
+        if os.environ["ROOT_DIR"] != "":
+            so_path = os.environ["ROOT_DIR"] + "/" + so_path
 
 
-main = LJMD(so_path)
-main.initialize_system(input_path)
-main.run_simulation()
+    main = LJMD(so_path)
+    main.initialize_system(input_path)
+    main.run_simulation()
