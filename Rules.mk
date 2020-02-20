@@ -21,8 +21,11 @@ SHARED_FILE=lib$(PROJECT_NAME).so
 SHARED=$(LIB_PATH)/$(SHARED_FILE)
 
 ifeq ("$(origin WITH_MPI)", "command line")
-EXECUTER=mpirun -np
+EXECUTER=mpirun --mca btl ^openib -np
 NUM_PROC=$(WITH_MPI)
+PYTHON_EXE=$(ROOT_DIR)/ljmd_mp.py
+else
+PYTHON_EXE=$(ROOT_DIR)/ljmd.py
 endif
 ifeq ("$(origin WITH_OMP)", "command line")
 OMP_NUM_THREADS:=$(WITH_OMP)

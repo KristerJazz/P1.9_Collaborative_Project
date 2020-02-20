@@ -29,16 +29,16 @@ else
 CC=gcc
 endif
 
-default: $(EXE) $(SHARED)
+default: $(EXE) $(SHARED) $(HEADERS)
 
 clean:
 	rm -f *.mod *.o *.so ../*.x
 
 # linker rule
-$(EXE): $(SHARED) $(HEADERS)
-	$(CC) -o $@ $(CFLAGS) $(LDLIBS) -l$(PROJECT_NAME) -L$(LIB_PATH)
+$(EXE): $(OBJ)
+	$(CC) -o $@ $(CFLAGS) $(LDLIBS) $^
 
-$(SHARED): $(OBJ)
+$(SHARED): $(filter-out ljmd.o, $(OBJ))
 	$(CC) -shared -o $@ $(CFLAGS) $^ $(LDLIBS)
 
 # compilation pattern rule for objects
