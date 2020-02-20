@@ -13,6 +13,9 @@ compiler:
 install:
   - pip install -r requirements.txt
 
+env:
+  - OMPI_MCA_btl_vader_single_copy_mechanism=none
+
 script:
   - make units-check
   - make -B check
