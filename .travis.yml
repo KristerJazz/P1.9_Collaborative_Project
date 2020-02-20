@@ -5,9 +5,7 @@ python:
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y libomp-dev
-  - pushd scripts
-  - sudo ./get_mpich.sh
-  - popd
+  - sudo apt-get install -y openmpi-bin libopenmpi-dev 
 
 compiler:
   - gcc
