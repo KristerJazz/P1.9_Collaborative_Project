@@ -21,23 +21,27 @@
 int main(int argc, char **argv) {
   int nprint, i;
   char restfile[BLEN], trajfile[BLEN], ergfile[BLEN], line[BLEN];
+  mdsys_t sys;
 
 #ifdef _MPI
+  sys.mcom = MPI_COMM_WORLD;
+
   MPI_Init(&argc, &argv);
   int mid, msize;
-  MPI_Comm_rank(MPI_COMM_WORLD, &mid);
-  MPI_Comm_size(MPI_COMM_WORLD, &msize);
+  MPI_Comm_rank(sys.mcom, &mid);
+  MPI_Comm_size(sys.mcom, &msize);
 #else
   const int mid = 0;
 #endif /* _MPI */
 
   FILE *fp, *traj, *erg;
-  mdsys_t sys;
 
   traj = NULL; erg = NULL;
 
   /* read input file */
 #ifdef _MPI
+  sys.mid = mid;
+  sys.msize = msize;
   if (!mid) {
 #endif /* _MPI */
     if (get_a_line(stdin, line)) return 1;
@@ -73,24 +77,24 @@ int main(int argc, char **argv) {
 #ifdef _MPI
   }
   if (msize != 1) {
-    MPI_Bcast(&(sys.natoms), 1, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&(sys.mass), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&(sys.natoms), 1, MPI_INT, 0, sys.mcom);
+    MPI_Bcast(&(sys.mass), 1, MPI_DOUBLE, 0, sys.mcom);
 #ifndef WITH_MORSE
-    MPI_Bcast(&(sys.epsilon), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&(sys.sigma), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&(sys.epsilon), 1, MPI_DOUBLE, 0, sys.mcom);
+    MPI_Bcast(&(sys.sigma), 1, MPI_DOUBLE, 0, sys.mcom);
 #else
-    MPI_Bcast(&(sys.De), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&(sys.re), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&(sys.a), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&(sys.De), 1, MPI_DOUBLE, 0, sys.mcom);
+    MPI_Bcast(&(sys.re), 1, MPI_DOUBLE, 0, sys.mcom);
+    MPI_Bcast(&(sys.a), 1, MPI_DOUBLE, 0, sys.mcom);
 #endif
-    MPI_Bcast(&(sys.rcut), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&(sys.box), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Bcast(restfile, BLEN, MPI_CHAR, 0, MPI_COMM_WORLD);
-    MPI_Bcast(trajfile, BLEN, MPI_CHAR, 0, MPI_COMM_WORLD);
-    MPI_Bcast(ergfile, BLEN, MPI_CHAR, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&(sys.nsteps), 1, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&(sys.dt), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&nprint, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&(sys.rcut), 1, MPI_DOUBLE, 0, sys.mcom);
+    MPI_Bcast(&(sys.box), 1, MPI_DOUBLE, 0, sys.mcom);
+    MPI_Bcast(restfile, BLEN, MPI_CHAR, 0, sys.mcom);
+    MPI_Bcast(trajfile, BLEN, MPI_CHAR, 0, sys.mcom);
+    MPI_Bcast(ergfile, BLEN, MPI_CHAR, 0, sys.mcom);
+    MPI_Bcast(&(sys.nsteps), 1, MPI_INT, 0, sys.mcom);
+    MPI_Bcast(&(sys.dt), 1, MPI_DOUBLE, 0, sys.mcom);
+    MPI_Bcast(&nprint, 1, MPI_INT, 0, sys.mcom);
   }
 #endif /* _MPI */
 
@@ -129,9 +133,9 @@ int main(int argc, char **argv) {
   /* initialize forces and energies.*/
   sys.nfi = 0;
   force(&sys);
-  ekin(&sys);
 
   if (!mid) {
+    ekin(&sys);
     erg = fopen(ergfile, "w");
     traj = fopen(trajfile, "w");
 
