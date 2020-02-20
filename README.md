@@ -4,7 +4,7 @@
 |--------|---------|
 | ![](https://travis-ci.com/KristerJazz/P1.9_Collaborative_Project.svg?branch=master) | ![](https://travis-ci.com/KristerJazz/P1.9_Collaborative_Project.svg?branch=develop) |
 
-Current revision: **v0.2**
+Current revision: **v0.3**
 
 ## Description
 
