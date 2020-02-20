@@ -51,12 +51,6 @@ class LJMD:
             print("Please use the valid LJMD shared object file")
             raise
 
-    def ljmd_mpi_init(self):
-        self._ljmd.ljmd_mpi_init()
-
-    def ljmd_mpi_finalise(self):
-        self._ljmd.ljmd_mpi_finalise()
-
     def initialize_system(self, input_file):
         m_comm = MPI.COMM_WORLD
         m_comm_ptr = MPI._addressof(m_comm)
@@ -229,24 +223,19 @@ class LJMD:
         except:
             raise
 
+if __name__ == '__main__':
+    try:
+        input_path = sys.argv[1]
+    except:
+        raise
 
-try:
-    input_path = sys.argv[1]
-except:
-    raise
+    so_path = "lib/libljmd.so"
 
-so_path = "lib/libljmd.so"
+    if "ROOT_DIR" in os.environ.keys():
+        if os.environ["ROOT_DIR"] != "":
+            so_path = os.environ["ROOT_DIR"] + "/" + so_path
 
-if "ROOT_DIR" in os.environ.keys():
-    if os.environ["ROOT_DIR"] != "":
-        so_path = os.environ["ROOT_DIR"] + "/" + so_path
-
-comm = MPI.COMM_WORLD
-rank = comm.Get_rank()
-
-main = LJMD(so_path)
-#main.ljmd_mpi_init()
-main.initialize_system(input_path)
-main.run_simulation()
-exit(0)
-#main.ljmd_mpi_finalise()
+    main = LJMD(so_path)
+    main.initialize_system(input_path)
+    main.run_simulation()
+    exit(0)
