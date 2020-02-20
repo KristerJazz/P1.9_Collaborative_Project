@@ -3,8 +3,8 @@ include ../Rules.mk
 
 SHELL=/bin/sh
 CC=gcc
-CFLAGS:=-Wall -g -O3 -ffast-math -march=native -fomit-frame-pointer -I$(HEADER_PATH)
-LDLIBS=-lm
+CFLAGS:=-Wall -O3 -ffast-math -march=native -fomit-frame-pointer -I$(HEADER_PATH)
+LDLIBS=-lmvec -lm
 
 ifeq ("$(origin WITH_OMP)", "command line")
 CFLAGS+=-fopenmp
@@ -36,7 +36,7 @@ clean:
 
 # linker rule
 $(EXE): $(OBJ)
-	$(CC) -o $@ $(CFLAGS) $(LDLIBS) $^
+	$(CC) -o $@ $^ $(CFLAGS) $(LDLIBS)
 
 $(SHARED): $(filter-out ljmd.o, $(OBJ))
 	$(CC) -shared -o $@ $(CFLAGS) $^ $(LDLIBS)
