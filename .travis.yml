@@ -19,5 +19,6 @@ env:
 script:
   - make units-check
   - make -B check
+  - python3 -m pytest .
   - make -B WITH_MPI=2 WITH_OMP=1 check
   - make -B WITH_MPI=1 WITH_OMP=2 check
