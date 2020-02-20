@@ -10,6 +10,10 @@
 #ifndef __LJMD__
 #define __LJMD__
 
+#ifdef _MPI
+#include <mpi.h>
+#endif
+
 #include <stdio.h>
 
 /**
